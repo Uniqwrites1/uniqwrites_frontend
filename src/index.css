@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for cards and animations */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Card hover effects */
+.transition-transform {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover\:scale-105:hover {
+  transform: scale(1.05);
+}
+
+/* Additional styles for a modern look */
+.card-shadow {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-border {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Color palette */
+.bg-gold {
+  background-color: #FFD700; /* Gold */
+}
+
+.text-secondary {
+  color: #000000; /* Black */
+}
+
+.text-gray-600 {
+  color: #555555; /* Dark Gray for description */
+}
+
+/* Add this to your existing CSS file */
+.main-background {
+  position: relative;
+  z-index: 1; /* Ensure content is above the background */
+}
+
+.main-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent overlay */
+  z-index: -1; /* Place behind the content */
+}
