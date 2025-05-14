@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
+import { Facebook, Instagram, Mail, MessageCircle } from "lucide-react";
 import logoImage from "../assets/images/Uniqwrites_logo.jpg"; // Importing the logo image
 
 const Footer = () => {
@@ -48,46 +48,61 @@ const Footer = () => {
             <h3 className="text-lg font-bold mb-4">Services</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/services#tutoring" className="hover:text-primary">
-                  Home Tutoring
+                <Link to="/services" className="hover:text-primary">
+                  Tutoring
                 </Link>
               </li>
               <li>
-                <Link to="/services#literacy" className="hover:text-primary">
-                  Online Tutoring 
+                <Link to="/PurposeActionPoint" className="hover:text-primary">
+                  Purpose Action Point 
+                </Link>
+              </li>              <li>
+                <Link to="/initiatives" className="hover:text-primary">
+                  Initiatives
                 </Link>
               </li>
               <li>
-                <Link to="/services#literacy" className="hover:text-primary">
-                  Homecshooling 
-                </Link>
+                <Link to="/teacher/job-board" className="hover:text-primary">
+                  Teaching Jobs 
+                  </Link>
               </li>
-              <li>
-                <Link to="/services#schools" className="hover:text-primary">
-                  Exam prep and homework help
-                </Link>
-              </li>
-              <li>
-                <Link to="/services#career" className="hover:text-primary">
-                  School Solutions
-                </Link>
-              </li>
+              
             </ul>
           </div>
           <div>
             <h3 className="text-lg font-bold mb-4">Connect With Us</h3>
             <div className="flex space-x-4 mb-4">
-              <a href="#" className="hover:text-primary">
+              <a 
+                href="https://web.facebook.com/profile.php?id=61575843015840" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-primary"
+              >
                 <Facebook />
               </a>
-              <a href="#" className="hover:text-primary">
-                <Twitter />
-              </a>
-              <a href="#" className="hover:text-primary">
+              <a 
+                href="https://www.instagram.com/uniqchild1/?hl=en" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-primary"
+              >
                 <Instagram />
               </a>
-              <a href="#" className="hover:text-primary">
+              <a 
+                href="mailto:uniqwrites1@gmail.com" 
+                className="hover:text-primary"
+                aria-label="Send us an email"
+              >
                 <Mail />
+              </a>
+              <a 
+                href="https://api.whatsapp.com/send?phone=2349164923056" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="hover:text-primary"
+                aria-label="Chat with us on WhatsApp"
+              >
+                <MessageCircle />
               </a>
             </div>
             <p className="text-sm">

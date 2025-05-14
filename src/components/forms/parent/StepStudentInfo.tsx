@@ -7,16 +7,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 const schema = yup.object().shape({
   students: yup.array().of(
     yup.object().shape({
-      name: yup.string().required("Student name is required"),
+      name: yup.string(),
       age: yup.number()
-        .required("Age is required")
-        .min(3, "Student must be at least 3 years old")
-        .max(18, "Student must be 18 or younger")
-        .typeError("Age must be a number"),
-      currentClass: yup.string().required("Current class is required"),
+        .transform((value) => (isNaN(value) ? undefined : value))
+        .nullable(),
+      currentClass: yup.string(),
       peculiarity: yup.string().optional()
     })
-  ).required("At least one student is required")
+  )
 });
 
 interface Student {
@@ -76,18 +74,18 @@ const StepStudentInfo: React.FC<StepStudentInfoProps> = ({
     >
       <form onSubmit={handleSubmit(() => onNext())} className="space-y-6">
         {formData.students.map((student, index) => (
-          <div key={index} className="p-6 bg-white rounded-lg shadow-md border border-gray-100">
-            <div className="flex justify-between items-center mb-4">
+          <div key={index} className="p-6 bg-white rounded-lg shadow-md border border-gray-100">            <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-black">Student {index + 1}</h3>
-              {formData.students.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => removeStudent(index)}
-                  className="text-red-500 hover:text-red-700 text-sm"
-                >
-                  Remove
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => removeStudent(index)}
+                className="flex items-center px-3 py-1 bg-red-50 text-red-600 rounded-md hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={formData.students.length === 1}
+                aria-label={`Delete Student ${index + 1}`}
+              >
+                <span className="mr-1">×</span>
+                Delete Student
+              </button>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

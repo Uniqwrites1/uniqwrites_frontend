@@ -104,19 +104,49 @@ const StepParentInfo: React.FC<StepParentInfoProps> = ({
         <div>
           <label className="block text-sm font-semibold text-black mb-2" htmlFor="stateOfResidence">
             State of Residence
-          </label>
-          <select
+          </label>          <select
             id="stateOfResidence"
             {...register("stateOfResidence")}
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFC107] focus:border-transparent transition-all duration-200"
           >
             <option value="">Select state</option>
-            <option value="lagos">Lagos</option>
-            <option value="abuja">Abuja</option>
-            <option value="rivers">Rivers</option>
+            <option value="abia">Abia</option>
+            <option value="adamawa">Adamawa</option>
+            <option value="akwaibom">Akwa Ibom</option>
+            <option value="anambra">Anambra</option>
+            <option value="bauchi">Bauchi</option>
+            <option value="bayelsa">Bayelsa</option>
+            <option value="benue">Benue</option>
+            <option value="borno">Borno</option>
+            <option value="crossriver">Cross River</option>
+            <option value="delta">Delta</option>
+            <option value="ebonyi">Ebonyi</option>
+            <option value="edo">Edo</option>
+            <option value="ekiti">Ekiti</option>
+            <option value="enugu">Enugu</option>
+            <option value="fct">Federal Capital Territory</option>
+            <option value="gombe">Gombe</option>
+            <option value="imo">Imo</option>
+            <option value="jigawa">Jigawa</option>
+            <option value="kaduna">Kaduna</option>
             <option value="kano">Kano</option>
+            <option value="katsina">Katsina</option>
+            <option value="kebbi">Kebbi</option>
+            <option value="kogi">Kogi</option>
+            <option value="kwara">Kwara</option>
+            <option value="lagos">Lagos</option>
+            <option value="nasarawa">Nasarawa</option>
+            <option value="niger">Niger</option>
+            <option value="ogun">Ogun</option>
+            <option value="ondo">Ondo</option>
+            <option value="osun">Osun</option>
             <option value="oyo">Oyo</option>
-            {/* Add more states as needed */}
+            <option value="plateau">Plateau</option>
+            <option value="rivers">Rivers</option>
+            <option value="sokoto">Sokoto</option>
+            <option value="taraba">Taraba</option>
+            <option value="yobe">Yobe</option>
+            <option value="zamfara">Zamfara</option>
           </select>
           {errors.stateOfResidence && (
             <p className="mt-1 text-sm text-red-600">{errors.stateOfResidence.message}</p>

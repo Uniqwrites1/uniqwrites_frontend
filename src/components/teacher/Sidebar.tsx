@@ -25,15 +25,15 @@ const Sidebar: React.FC = () => {
 
   return (
     <aside 
-      className={`bg-violet-800 text-white h-screen transition-all duration-300 ${
+      className={`bg-black text-yellow-400 h-screen transition-all duration-300 ${
         isExpanded ? 'w-64' : 'w-16'
       } fixed left-0 top-0`}
     >
-      <div className="flex justify-between items-center p-4 border-b border-violet-700">
+      <div className="flex justify-between items-center p-4 border-b border-gray-800">
         {isExpanded && <h2 className="font-bold text-lg">Teacher Portal</h2>}
         <button 
           onClick={toggleSidebar}
-          className="p-1 rounded-full hover:bg-violet-700 transition-colors"
+          className="p-1 rounded-full hover:bg-yellow-400 hover:text-black transition-colors"
         >
           {isExpanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
         </button>
@@ -45,7 +45,7 @@ const Sidebar: React.FC = () => {
             <li key={item.name}>
               <Link 
                 to={item.path}
-                className="flex items-center px-4 py-3 hover:bg-violet-700 transition-colors"
+                className="flex items-center px-4 py-3 hover:bg-yellow-400 hover:text-black transition-colors"
               >
                 <span className="mr-3">{item.icon}</span>
                 {isExpanded && <span>{item.name}</span>}

@@ -2,30 +2,46 @@ export const parentServices = [
   { 
     title: "Home Tutoring", 
     description: "One-on-One & Group Tutoring: Personalized learning tailored to individual needs or collaborative sessions that encourage peer engagement and shared knowledge. Virtual & Physical Lessons: Flexible learning options—join classes from anywhere online or experience face-to-face instruction for hands-on guidance.", 
-    icon: "BookOpen" 
+    icon: "GraduationCap" 
   },
   { 
     title: "Homework Help", 
     description: "Expert support to simplify complex assignments, reinforce understanding, and boost academic confidence.", 
-    icon: "BookOpen" 
+    icon: "PenTool" 
   },
   { 
     title: "Homeschooling", 
     description: "A structured, student-centered approach to education at home, ensuring personalized learning at the right pace.", 
-    icon: "BookOpen" 
+    icon: "Home" 
   },
   { 
     title: "Examination Prep", 
     description: "Comprehensive coaching with proven strategies to help students excel in standardized tests and secure top scores (SAT, IGCSE, WAEC, NECO, JAMB, & more).", 
-    icon: "BookOpen" 
+    icon: "Award" 
   }
 ];
 
 export const schoolServices = [
-  { title: "Request for Teachers", description: "Hire trained professionals easily.", icon: "School" },
-  { title: "Digital Transformation", description: "Modernize your school with edtech tools.", icon: "School" },
-  { title: "School Management System", description: "Automate admin tasks and communication.", icon: "School" },
-  { title: "EdTech Tools Consultation", description: "Explore the best digital teaching tools.", icon: "School" }
+  { 
+    title: "Request for Teachers", 
+    description: "Hire trained professionals easily.", 
+    icon: "Users" 
+  },
+  { 
+    title: "Digital Transformation", 
+    description: "Modernize your school with edtech tools.", 
+    icon: "Laptop" 
+  },
+  { 
+    title: "School Management System", 
+    description: "Automate admin tasks and communication.", 
+    icon: "BarChart2" 
+  },
+  { 
+    title: "EdTech Tools Consultation", 
+    description: "Explore the best digital teaching tools.", 
+    icon: "Lightbulb" 
+  }
 ];
 
 
@@ -38,17 +54,17 @@ export const teacherServices = [
   { 
     title: "Access Free Resources", 
     description: "Upgrade skills with top-notch teaching materials and strategies.", 
-    icon: "Users" 
+    icon: "BookOpen" 
   },
   { 
     title: "Become Indispensable", 
     description: "Gain training and insights to stand out as an exceptional educator.", 
-    icon: "Users" 
+    icon: "Star" 
   },
   { 
     title: "Secure Dignified Job Opportunities", 
     description: "Connect with schools and families that respect and value educators.", 
-    icon: "Users" 
+    icon: "Briefcase"
   },
   { 
     title: "Join a Purpose-Driven Community", 

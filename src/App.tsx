@@ -8,7 +8,11 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
-import Initiatives from "./pages/Initiatives";
+import Initiatives from "./pages/initiatives/Initiatives";
+import LiteracySponsor from "./pages/initiatives/literacy/LiteracySponsor";
+import LiteracyVolunteer from "./pages/initiatives/literacy/LiteracyVolunteer";
+import BackToSchoolSponsor from "./pages/initiatives/backtoschool/BackToSchoolSponsor";
+import BackToSchoolVolunteer from "./pages/initiatives/backtoschool/BackToSchoolVolunteer";
 import Blog from "./pages/Blog";
 import ParentTutoringRequestForm from "./pages/ParentTutoringRequest";
 import SchoolServiceRequestForm from "./pages/SchoolServiceRequest";
@@ -18,6 +22,7 @@ import Authentication from "./pages/Authentication";
 import RoleLogin from "./pages/RoleLogin";
 import RoleSignup from "./pages/RoleSignup";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
+import JobBoard from "./pages/teacher/job-board";
 import ParentDashboard from "./pages/parent/ParentDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 
@@ -67,6 +72,12 @@ function App() {
                 <Route path="/PurposeActionPoint" element={<PurposeActionPoint />} />
                 <Route path="/initiatives" element={<Initiatives />} />
                 
+                {/* Initiative Form Routes */}
+                <Route path="/initiatives/literacy/sponsor" element={<LiteracySponsor />} />
+                <Route path="/initiatives/literacy/volunteer" element={<LiteracyVolunteer />} />
+                <Route path="/initiatives/backtoschool/sponsor" element={<BackToSchoolSponsor />} />
+                <Route path="/initiatives/backtoschool/volunteer" element={<BackToSchoolVolunteer />} />
+                
                 {/* Authentication Routes */}
                 <Route path="/auth" element={<Authentication />} />
                 <Route path="/login/:role" element={<RoleLogin />} />
@@ -74,6 +85,7 @@ function App() {
                 
                 {/* Dashboard Routes */}
                 <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
+                <Route path="/teacher/job-board" element={<JobBoard />} /> {/* Add this route */}
                 <Route path="/parent/dashboard" element={<ParentDashboard />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
               </Routes>

@@ -1,6 +1,18 @@
-import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { BookOpen, Users, School } from "lucide-react";
+import { motion } from "framer-motion";
+import { 
+  BookOpen, 
+  Users, 
+  School, 
+  GraduationCap, 
+  PenTool, 
+  Home, 
+  Award,
+  Laptop,
+  BarChart2,
+  Lightbulb,
+  Star,
+  Briefcase
+} from "lucide-react";
 
 interface ServiceCardProps {
   title: string;
@@ -12,33 +24,41 @@ const iconMap: { [key: string]: JSX.Element } = {
   BookOpen: <BookOpen />,
   Users: <Users />,
   School: <School />,
+  GraduationCap: <GraduationCap />,
+  PenTool: <PenTool />,
+  Home: <Home />,
+  Award: <Award />,
+  Laptop: <Laptop />,
+  BarChart2: <BarChart2 />,
+  Lightbulb: <Lightbulb />,
+  Star: <Star />,
+  Briefcase: <Briefcase />,
 };
 
 export default function ServiceCard({ title, description, icon }: ServiceCardProps) {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      className={`border rounded-xl p-4 bg-white shadow-md transition-transform duration-300 transform ${
-        isHovered ? "scale-105 shadow-lg" : ""
-      }`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+  return (    <motion.div
+      className={`bg-white p-4 rounded-lg border border-gray-100 hover:border-yellow-400 
+        shadow hover:shadow-lg transition-all duration-300 group h-full flex flex-col`}
+      whileHover={{ scale: 1.02 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       role="button"
       tabIndex={0}
       aria-label={title}
     >
-      <div className="flex items-center gap-4">
-        {icon && iconMap[icon]}
-        <h3 className="text-lg font-semibold text-secondary">{title}</h3>
+      <div className="w-10 h-10 bg-black rounded-lg flex items-center justify-center mb-3 group-hover:bg-yellow-400 transition-colors duration-300">
+        {icon && (
+          <div className="text-yellow-400 group-hover:text-black transition-colors duration-300">
+            {iconMap[icon]}
+          </div>
+        )}
       </div>
-      <div
-        className={`mt-2 text-sm text-gray-600 transition-opacity duration-300 ${
-          isHovered ? "opacity-100" : "opacity-0"
-        }`}
-      >
+      <h3 className="text-lg font-bold mb-2 text-black group-hover:text-yellow-500 transition-colors duration-300">
+        {title}
+      </h3>
+      <p className="text-sm text-gray-600 leading-relaxed flex-grow">
         {description}
-      </div>
-    </div>
+      </p>
+    </motion.div>
   );
 }

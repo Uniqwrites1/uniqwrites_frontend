@@ -55,7 +55,7 @@ const Navbar = () => {
               Initiatives
             </Link>
             <Link
-              to="/purpose-action-point"
+              to="/PurposeActionPoint"
               className="text-secondary hover:text-primary font-medium"
             >
               Purpose Action Point
@@ -138,7 +138,7 @@ const Navbar = () => {
               Initiatives
             </Link>
             <Link
-              to="/purpose-action-point"
+              to="/PurposeActionPoint"
               className="block px-3 py-2 text-secondary hover:text-primary font-medium"
             >
               Purpose Action Point

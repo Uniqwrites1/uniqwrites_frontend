@@ -16,12 +16,12 @@ interface LatestJobPostsProps {
 
 const LatestJobPosts: React.FC<LatestJobPostsProps> = ({ jobs, isUserTrained }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <div className="bg-white p-6 rounded-lg shadow-md border border-gray-100">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Latest Job Posts</h3>
+        <h3 className="text-lg font-semibold text-black">Latest Job Posts</h3>
         <Link 
           to="/teacher/job-board" 
-          className="text-violet-600 text-sm hover:underline"
+          className="text-yellow-400 text-sm hover:text-yellow-500"
         >
           View all jobs →
         </Link>
@@ -30,8 +30,8 @@ const LatestJobPosts: React.FC<LatestJobPostsProps> = ({ jobs, isUserTrained }) 
       <div className="space-y-4">
         {jobs.length > 0 ? (
           jobs.map((job) => (
-            <div key={job.id} className="border-b pb-4 last:border-b-0">
-              <h4 className="font-medium">{job.title}</h4>
+            <div key={job.id} className="border-b pb-4 last:border-b-0 hover:bg-black hover:bg-opacity-5 p-3 rounded transition-colors duration-200">
+              <h4 className="font-medium text-black">{job.title}</h4>
               <div className="flex justify-between items-center mt-2">
                 <div className="text-sm text-gray-600">
                   <span className="mr-3">{job.mode}</span>
@@ -39,10 +39,10 @@ const LatestJobPosts: React.FC<LatestJobPostsProps> = ({ jobs, isUserTrained }) 
                 </div>
                 <button
                   disabled={!isUserTrained}
-                  className={`px-4 py-1 rounded text-sm ${
+                  className={`px-4 py-1 rounded text-sm transition-all duration-300 ${
                     isUserTrained 
-                      ? 'bg-violet-600 text-white hover:bg-violet-700' 
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      ? 'bg-yellow-400 text-black hover:bg-yellow-500' 
+                      : 'bg-gray-200 text-gray-600 cursor-not-allowed'
                   }`}
                 >
                   Apply

@@ -69,23 +69,23 @@ const JobBoard: React.FC = () => {
   const modes = [...new Set(mockJobs.map(job => job.mode))];
   const locations = [...new Set(mockJobs.map(job => job.location))];
 
-  return (
+  return (    
     <TeacherDashboardLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Job Board</h1>
-        <p className="text-gray-600">Find and apply for teaching opportunities</p>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-black mb-2">Teaching Opportunities</h1>
+        <p className="text-gray-600 text-lg">Discover and apply for teaching positions that match your expertise</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
-        <h2 className="font-semibold mb-3">Filter Jobs</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="bg-white p-6 rounded-xl shadow-lg mb-8 border border-gray-100">
+        <h2 className="text-xl font-bold mb-4 text-black">Filter Opportunities</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label className="block text-sm font-medium mb-1">Subject</label>
+            <label className="block text-sm font-medium text-black mb-1">Subject</label>
             <select
               value={subjectFilter}
               onChange={(e) => setSubjectFilter(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400"
             >
               <option value="">All Subjects</option>
               {subjects.map(subject => (
@@ -95,11 +95,11 @@ const JobBoard: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-1">Mode</label>
+            <label className="block text-sm font-medium text-black mb-1">Mode</label>
             <select
               value={modeFilter}
               onChange={(e) => setModeFilter(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400"
             >
               <option value="">All Modes</option>
               {modes.map(mode => (
@@ -109,11 +109,11 @@ const JobBoard: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium mb-1">Location</label>
+            <label className="block text-sm font-medium text-black mb-1">Location</label>
             <select
               value={locationFilter}
               onChange={(e) => setLocationFilter(e.target.value)}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-yellow-400 focus:border-yellow-400"
             >
               <option value="">All Locations</option>
               {locations.map(location => (
@@ -125,40 +125,43 @@ const JobBoard: React.FC = () => {
       </div>
 
       {/* Job Listings */}
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 gap-6">
         {filteredJobs.length > 0 ? (
           filteredJobs.map((job) => (
-            <div key={job.id} className="bg-white p-6 rounded-lg shadow-md">
-              <h3 className="text-lg font-semibold">{job.title}</h3>
-              <p className="text-gray-600 mt-1">{job.description}</p>
+            <div key={job.id} className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 hover:border-yellow-400 transition-all duration-300">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="text-xl font-bold text-black mb-2">{job.title}</h3>
+                  <p className="text-gray-600">{job.description}</p>
+                </div>
+                <span className="text-sm text-gray-500 whitespace-nowrap ml-4">Posted: {job.postedDate}</span>
+              </div>
               
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-                <div>
-                  <p className="text-sm text-gray-500">Subject</p>
-                  <p className="font-medium">{job.subject}</p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6">
+                <div className="bg-black bg-opacity-5 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500 mb-1">Subject</p>
+                  <p className="font-semibold text-black">{job.subject}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Mode</p>
-                  <p className="font-medium">{job.mode}</p>
+                <div className="bg-black bg-opacity-5 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500 mb-1">Mode</p>
+                  <p className="font-semibold text-black">{job.mode}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Location</p>
-                  <p className="font-medium">{job.location}</p>
+                <div className="bg-black bg-opacity-5 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500 mb-1">Location</p>
+                  <p className="font-semibold text-black">{job.location}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Salary</p>
-                  <p className="font-medium">{job.salary}</p>
+                <div className="bg-black bg-opacity-5 p-3 rounded-lg">
+                  <p className="text-sm text-gray-500 mb-1">Salary</p>
+                  <p className="font-semibold text-black">{job.salary}</p>
                 </div>
               </div>
               
-              <div className="flex justify-between items-center mt-4 pt-4 border-t">
-                <p className="text-sm text-gray-500">Posted: {job.postedDate}</p>
+              <div className="flex justify-end items-center mt-6">
                 <button
-                  disabled={!isUserTrained}
-                  className={`px-6 py-2 rounded ${
+                  disabled={!isUserTrained}              className={`px-6 py-3 rounded-lg font-bold transition-all duration-300 ${
                     isUserTrained 
-                      ? 'bg-violet-600 text-white hover:bg-violet-700' 
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      ? 'bg-yellow-400 text-black hover:bg-yellow-500 hover:shadow-lg' 
+                      : 'bg-gray-200 text-gray-600 cursor-not-allowed'
                   }`}
                 >
                   {isUserTrained ? 'Apply Now' : 'Complete Training to Apply'}
