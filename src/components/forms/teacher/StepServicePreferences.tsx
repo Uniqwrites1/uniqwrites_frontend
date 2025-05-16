@@ -1,15 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { ErrorHandler } from "../../../utils/errorHandler";
 
-const schema = yup.object().shape({
+const schema = yup.object({
   availabilityMode: yup.string().required("Please select an availability mode"),
   preferredOpportunities: yup.string().required("Please enter your preferred opportunities"),
-  tutoringModes: yup.array().min(1, "Please select at least one tutoring mode"),
+  tutoringModes: yup.array().of(yup.string()).min(1, "Please select at least one tutoring mode"),
   subjects: yup.string().required("Please enter subjects you can teach")
-});
+}).required();
 
 interface FormData {
   availabilityMode: string;
@@ -30,20 +31,42 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
   updateFormData,
   onNext,
   onPrevious,
-}) => {  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+}) => {
+  const [error, setError] = useState<string | null>(null);
+    const { 
+    register, 
+    handleSubmit, 
+    formState: { errors } 
+  } = useForm<FormData>({
     resolver: yupResolver(schema),
-    defaultValues: formData,
+    defaultValues: formData as FormData,
   });
 
-  const onSubmit = (data: FormData) => {
-    Object.entries(data).forEach(([key, value]) => {
-      updateFormData(key, value);
-    });
-    onNext();
-  };
-
+  const handleFormSubmit = handleSubmit(async (data: FormData) => {
+    try {
+      setError(null);
+      // Handle each form field type correctly
+      Object.entries(data).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+          updateFormData(key, value as string[]);
+        } else {
+          updateFormData(key, value as string);
+        }
+      });
+      onNext();
+    } catch (err) {
+      const message = ErrorHandler.getUserFriendlyMessage(err);
+      setError(message);
+    }
+  });
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form onSubmit={handleFormSubmit} className="space-y-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative" role="alert">
+          <span className="block sm:inline">{error}</span>
+        </div>
+      )}
+
       <div>
         <label className="block text-sm font-medium mb-2">Availability Mode</label>
         <div className="flex space-x-4">
@@ -75,6 +98,9 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
             Both
           </label>
         </div>
+        {errors.availabilityMode && (
+          <p className="text-red-500 text-sm mt-1">{errors.availabilityMode.message}</p>
+        )}
       </div>
 
       <div>
@@ -85,6 +111,9 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
           className="mt-1 block w-full border rounded px-3 py-2"
           placeholder="Enter your preferred opportunities"
         />
+        {errors.preferredOpportunities && (
+          <p className="text-red-500 text-sm mt-1">{errors.preferredOpportunities.message}</p>
+        )}
       </div>
 
       <div>
@@ -118,6 +147,9 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
             <span>School Tutors</span>
           </label>
         </div>
+        {errors.tutoringModes && (
+          <p className="text-red-500 text-sm mt-1">{errors.tutoringModes.message}</p>
+        )}
       </div>
 
       <div>
@@ -128,7 +160,12 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
           className="mt-1 block w-full border rounded px-3 py-2"
           placeholder="Enter subjects you can teach (comma-separated)"
         />
-      </div>      <div className="flex justify-between pt-6">
+        {errors.subjects && (
+          <p className="text-red-500 text-sm mt-1">{errors.subjects.message}</p>
+        )}
+      </div>
+
+      <div className="flex justify-between pt-6">
         <button
           type="button"
           onClick={onPrevious}

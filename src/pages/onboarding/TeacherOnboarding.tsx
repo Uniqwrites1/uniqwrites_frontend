@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+// Will be used when implementing auth functionality
+// import { useAuth } from '../../hooks/useAuth';
 
 interface TeacherProfile {
   firstName: string;
@@ -15,7 +16,7 @@ interface TeacherProfile {
 
 const TeacherOnboarding: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Will be used when implementing user profile management
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<TeacherProfile>({

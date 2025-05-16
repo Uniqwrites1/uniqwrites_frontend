@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { 
   Home as HomeIcon, 
   UserCheck, 
-  FileText, 
   Briefcase, 
   CreditCard, 
   Star, 
@@ -13,12 +12,11 @@ import {
   X,
   PenTool,
   BarChart2,
-  Upload,
   Plus,
   Edit,
   Trash2
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import DashboardLayout from '../../layouts/DashboardLayout';
 
 // Sidebar Component
 const Sidebar = ({ 
@@ -87,7 +85,7 @@ const Sidebar = ({
 
 // Blog Management Section
 const BlogSection = () => {
-  const [posts, setPosts] = useState([
+  const [posts] = useState([
     { id: 1, title: 'Getting Started with Online Tutoring', status: 'published', date: '2025-05-12' },
     { id: 2, title: 'Tips for Effective Learning', status: 'draft', date: '2025-05-10' }
   ]);
@@ -142,7 +140,7 @@ const BlogSection = () => {
 
 // Training Modules Section
 const TrainingSection = () => {
-  const [modules, setModules] = useState([
+  const [modules] = useState([
     { 
       id: 1, 
       title: 'Effective Online Teaching', 
@@ -287,8 +285,6 @@ const AnalyticsSection = () => {
 };
 
 const OverviewSection = () => {
-  const { user } = useAuth();
-  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {/* Pending Approvals */}
@@ -336,7 +332,6 @@ const OverviewSection = () => {
 const AdminDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('overview');
-  const { logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -371,4 +366,12 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-export default AdminDashboard;
+const AdminDashboardWithLayout = () => {
+  return (
+    <DashboardLayout requiredRole="admin">
+      <AdminDashboard />
+    </DashboardLayout>
+  );
+};
+
+export default AdminDashboardWithLayout;

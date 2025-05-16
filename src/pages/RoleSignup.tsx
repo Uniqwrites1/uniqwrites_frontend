@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../context/AuthContext';
+import { getDashboardUrl } from '../utils/authUtils';
 
 interface LocationState {
   prefilledData?: {
@@ -9,6 +10,8 @@ interface LocationState {
     [key: string]: string | undefined;
   };
   source?: string;
+  from?: string;
+  targetDashboard?: string;
 }
 
 interface GoogleIconProps {
@@ -35,6 +38,9 @@ const RoleSignup: React.FC = () => {
   const { signup, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
+  // Extract destination from location state (if provided)
+  const targetDashboard = location.state?.targetDashboard;
+  
   useEffect(() => {
     if (location.state) {
       const { prefilledData, source } = location.state as LocationState;
@@ -99,20 +105,8 @@ const RoleSignup: React.FC = () => {
         profile
       });
       
-      // Navigate to role-specific onboarding
-      switch(validRole) {
-        case 'teacher':
-          navigate('/teacher/onboarding');
-          break;
-        case 'parent':
-          navigate('/parent/onboarding');
-          break;
-        case 'school':
-          navigate('/school/onboarding');
-          break;
-        default:
-          navigate('/');
-      }
+      // Navigate to the target dashboard or default dashboard for the role
+      navigate(targetDashboard || getDashboardUrl(validRole));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Signup failed. Please try again.';
       setError(errorMessage);
@@ -133,20 +127,8 @@ const RoleSignup: React.FC = () => {
     try {
       await loginWithGoogle(role as UserRole);
       
-      // Navigate to role-specific onboarding
-      switch(role) {
-        case 'teacher':
-          navigate('/teacher/onboarding');
-          break;
-        case 'parent':
-          navigate('/parent/onboarding');
-          break;
-        case 'school':
-          navigate('/school/onboarding');
-          break;
-        default:
-          navigate('/');
-      }
+      // Navigate to the target dashboard or default dashboard for the role
+      navigate(targetDashboard || getDashboardUrl(role as UserRole));
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Google signup failed';
       setError(errorMessage);

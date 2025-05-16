@@ -11,10 +11,10 @@ import {
   Menu, 
   X,
   Upload,
-  MessageSquare,
   Youtube 
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
+import DashboardLayout from '../../layouts/DashboardLayout';
 
 // Sidebar Component
 const Sidebar = ({ 
@@ -31,14 +31,8 @@ const Sidebar = ({
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+  // Implementation for logout function will be added here
+  // when the UI components are ready
 
   const sidebarItems = [
     { name: 'Dashboard', icon: <HomeIcon />, section: 'dashboard' },
@@ -54,7 +48,7 @@ const Sidebar = ({
   return (
     <div className={`
       fixed md:static z-20 top-0 left-0 h-full w-64 bg-black text-yellow-400 
-      transform transition-transform duration-300 ease-in-out
+      transform transition-transform duration-300 ease-in-out flex flex-col
       ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
     `}>
       <div className="flex justify-between items-center p-4 md:hidden">
@@ -63,7 +57,7 @@ const Sidebar = ({
           <X className="text-yellow-400" />
         </button>
       </div>
-      <nav className="mt-8">
+      <nav className="mt-8 flex-grow">
         {sidebarItems.map((item) => (
           <button
             key={item.section}
@@ -79,11 +73,14 @@ const Sidebar = ({
         ))}
       </nav>
       
-      {/* Logout Button */}
-      <div className="absolute bottom-0 w-full p-4">
+      {/* Logout Button - positioned with margin-top auto to push it to the bottom without absolute positioning */}
+      <div className="w-full p-4 border-t border-yellow-900 mt-auto">
         <button
-          onClick={handleLogout}
-          className="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-100 transition-colors rounded"
+          onClick={() => {
+            logout();
+            navigate('/login');
+          }}
+          className="w-full flex items-center px-4 py-3 text-red-500 hover:bg-red-100 hover:bg-opacity-20 transition-colors rounded"
         >
           <span className="mr-3">🚪</span>
           <span>Logout</span>
@@ -672,15 +669,11 @@ const SettingsSection = () => {
 };
 
 const TeacherDashboard: React.FC = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+  // We'll use these hooks when implementing logout functionality
+  // const { logout } = useAuth();
+  // const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
-
-  const handleLogout = () => {
-    logout();
-    navigate('/');
-  };
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -715,4 +708,12 @@ const TeacherDashboard: React.FC = () => {
   );
 };
 
-export default TeacherDashboard;
+const TeacherDashboardWithLayout = () => {
+  return (
+    <DashboardLayout requiredRole="teacher">
+      <TeacherDashboard />
+    </DashboardLayout>
+  );
+};
+
+export default TeacherDashboardWithLayout;

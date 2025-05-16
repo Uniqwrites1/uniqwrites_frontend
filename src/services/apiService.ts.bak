@@ -3,7 +3,7 @@ import { ErrorHandler, APIError } from '../utils/errorHandler';
 import { apiCache, generateCacheKey } from '../utils/cacheUtils';
 import api from '../api/axios';
 import { authService } from './authService';
-import { API_BASE_URL, API_ENDPOINTS } from '../proxy';
+import { API_BASE_URL, API_ENDPOINTS, getApiUrl } from '../proxy';
 import type { 
   APIResponse, 
   DashboardData, 
@@ -14,6 +14,7 @@ import type {
   SchoolServiceData,
   UserProfile,
   PaginatedResponse,
+  Activity,
   Notification
 } from '../types/api';
 import type { User, SignupData } from '../context/AuthContext';
@@ -31,13 +32,11 @@ interface LoginResponse {
 // Create axios instance with default configurations
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // Increased timeout to 15 seconds
+  timeout: 10000, // 10 seconds
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
-  },
-  // Add withCredentials for cookie-based auth (if used by your backend)
-  withCredentials: true
+  }
 });
 
 // Request Interceptor for adding authentication token
@@ -51,63 +50,38 @@ const apiClient = axios.create({
     },
     error => Promise.reject(error)
   );
+
   // Response Interceptor for global error handling
   apiClient.interceptors.response.use(
     response => response,
     error => {
       // Log and handle errors consistently
-      const requestUrl = error.config?.url || 'unknown endpoint';
-      const requestMethod = error.config?.method?.toUpperCase() || 'UNKNOWN';
-      
-      // Enhanced error logging
-      console.error(`API Error (${requestMethod} ${requestUrl}):`, error);
-      
+      ErrorHandler.logError(error);
+
       if (error.response) {
-        // Get detailed error information from server response
-        const serverErrorData = error.response.data;
-        const errorDetails = serverErrorData?.message || serverErrorData?.error || JSON.stringify(serverErrorData);
-        
-        // Log the detailed server response
-        console.error(`Server Response (${error.response.status}):`, errorDetails);
-        
-        ErrorHandler.logError(error, `${requestMethod} ${requestUrl}: ${errorDetails}`);
-          // Server responded with an error status
+        // Server responded with an error status
         switch (error.response.status) {
           case 400:
-            throw new Error(`Bad Request: ${errorDetails || 'Invalid data'}`);          case 401: {
-            // Handle unauthorized error (token expired or invalid)
-            // First, remove the token
+            throw new Error('Bad Request: Invalid data');
+          case 401:
+            // Unauthorized - clear token and redirect to login
             localStorage.removeItem('token');
-            
-            // Rather than redirecting immediately, check if we're in the middle of authentication
-            const isAuthPath = window.location.pathname.includes('/login') || 
-                               window.location.pathname.includes('/signup') ||
-                               window.location.pathname.includes('/auth');
-            
-            // Only redirect if not already on an auth page
-            if (!isAuthPath) {
-              // Store the current path so user can be redirected back after login
-              localStorage.setItem('redirectAfterLogin', window.location.pathname);
-              window.location.href = '/auth';
-            }
+            window.location.href = '/login';
             break;
-          }
           case 403:
-            throw new Error(`Forbidden: ${errorDetails || 'You do not have permission'}`);
+            throw new Error('Forbidden: You do not have permission');
           case 404:
-            throw new Error(`Not Found: ${errorDetails || 'Resource does not exist'}`);
+            throw new Error('Not Found: Resource does not exist');
           case 500:
-            throw new Error(`Server Error (${requestUrl}): ${errorDetails || 'Please try again later'}`);
+            throw new Error('Server Error: Please try again later');
           default:
-            throw new Error(`Error ${error.response.status}: ${errorDetails || 'An unexpected error occurred'}`);
+            throw new Error('An unexpected error occurred');
         }
       } else if (error.request) {
         // Request made but no response received
-        ErrorHandler.logError(error, `No Response (${requestMethod} ${requestUrl})`);
-        throw new Error(`Network Error: No response from server (${requestUrl})`);
+        throw new Error('Network Error: No response from server');
       } else {
         // Error in setting up the request
-        ErrorHandler.logError(error, `Request Setup Error (${requestMethod} ${requestUrl})`);
         throw new Error('Error: Request could not be sent');
       }
 
@@ -121,8 +95,9 @@ const apiClient = axios.create({
   };
 
   // API Service with strongly typed methods
-  const apiServiceImpl = {    // Teacher Registration
-    registerTeacher: async (teacherData: TeacherData): Promise<AxiosResponse<APIResponse<TeacherData>>> => {
+  const apiServiceImpl = {
+    // Teacher Registration
+    registerTeacher: async (teacherData: TeacherData): Promise<AxiosResponse<any>> => {
       try {
         logApiCall('POST', '/teachers/register', teacherData);
         const response = await apiClient.post('/teachers/register', teacherData);
@@ -134,7 +109,7 @@ const apiClient = axios.create({
     },
 
     // Parent Tutoring Request
-    submitTutoringRequest: async (requestData: TutoringRequestData): Promise<AxiosResponse<APIResponse<TutoringRequestData>>> => {
+    submitTutoringRequest: async (requestData: TutoringRequestData): Promise<AxiosResponse<any>> => {
       try {
         logApiCall('POST', '/requests/tutoring', requestData);
         const response = await apiClient.post('/requests/tutoring', requestData);
@@ -146,7 +121,7 @@ const apiClient = axios.create({
     },
 
     // School Service Request
-    submitSchoolServiceRequest: async (requestData: SchoolServiceData): Promise<AxiosResponse<APIResponse<SchoolServiceData>>> => {
+    submitSchoolServiceRequest: async (requestData: SchoolServiceData): Promise<AxiosResponse<any>> => {
       try {
         logApiCall('POST', '/requests/school-services', requestData);
         const response = await apiClient.post('/requests/school-services', requestData);
@@ -160,150 +135,32 @@ const apiClient = axios.create({
       try {
         const endpoint = API_ENDPOINTS.AUTH.LOGIN;
         logApiCall('POST', endpoint, { email, role });
-        
-        // Structured request payload with consistent formatting
-        const payload = {
-          email: email.trim(),
-          password,
-          role: role || 'unknown'
-        };
-        
-        console.log('Sending login request to:', endpoint);
-        console.log('Login payload:', { email: payload.email, role: payload.role });
-        
-        const response = await apiClient.post(endpoint, payload);
-        
-        // Validate response before processing
-        if (!response.data || !response.data.token) {
-          throw new Error('Invalid response from server: Missing token data');
-        }
-        
+        const response = await apiClient.post(endpoint, { email, password, role });
         // Store token and user info
         localStorage.setItem('token', response.data.token);
         return response.data;
       } catch (error) {
-        console.error('Login error details:', error);
-        ErrorHandler.logError(error as Error, `Login failed: ${email}`);
+        ErrorHandler.logError(error as Error);
         throw error;
       }
-    },
-    
-    // Google Authentication
-    googleLogin: async (role: string): Promise<LoginResponse> => {
-      try {
-        const endpoint = API_ENDPOINTS.AUTH.GOOGLE_LOGIN;
-        logApiCall('POST', endpoint, { role });
-        
-        const payload = {
-          role: role || 'unknown',
-          // Include any necessary Google authentication data
-          googleAuthType: 'login'
-        };
-        
-        console.log('Sending Google login request to:', endpoint);
-        const response = await apiClient.post(endpoint, payload);
-        
-        // Validate response before processing
-        if (!response.data || !response.data.token) {
-          throw new Error('Invalid response from Google auth server: Missing token data');
-        }
-        
-        // Store token and user info
-        localStorage.setItem('token', response.data.token);
-        return response.data;
-      } catch (error) {
-        console.error('Google login error details:', error);
-        ErrorHandler.logError(error as Error, `Google login failed for role: ${role}`);
-        throw error;
-      }
-    },signup: async (userData: SignupData): Promise<LoginResponse> => {
+    },    signup: async (userData: SignupData): Promise<LoginResponse> => {
       try {
         const endpoint = API_ENDPOINTS.AUTH.SIGNUP;
-        
-        // Clean and validate user data
-        const cleanedData = {
-          ...userData,
-          email: userData.email.trim(),
-          role: userData.role || 'unknown'
-        };
-        
-        logApiCall('POST', endpoint, { email: cleanedData.email, role: cleanedData.role });
-        console.log('Sending signup request to:', endpoint);
-        console.log('Signup payload:', { email: cleanedData.email, role: cleanedData.role });
-          const response = await apiClient.post(endpoint, cleanedData);
-          // More flexible response validation
-        if (!response.data) {
-          throw new Error('Invalid response from server: Empty response data');
-        }
-        
-        // Handle string responses (like "User registered successfully")
-        if (typeof response.data === 'string') {
-          console.log('Server returned string response:', response.data);
-          // Create placeholder data for development
-          const devToken = `dev_token_${Date.now()}`;
-          localStorage.setItem('token', devToken);
-            return {
-            token: devToken,
-            user: {
-              id: `user_${Date.now()}`,
-              email: cleanedData.email,
-              role: cleanedData.role,
-              profile: {
-                firstName: '',
-                lastName: ''
-              }
-            }
-          };
-        }
-        
-        // Check for token in different response formats
-        const token = response.data.token || 
-                      (response.data.data && response.data.data.token) || 
-                      null;
-                      
-        if (!token) {
-          console.warn('Warning: Response missing token data', response.data);
-          // Create a placeholder token for development purposes
-          const devToken = `dev_token_${Date.now()}`;
-          localStorage.setItem('token', devToken);
-          
-          // Add mock user data if missing
-          if (!response.data.user) {
-            response.data.user = {
-              id: `user_${Date.now()}`,
-              email: cleanedData.email,
-              role: cleanedData.role,
-              profile: {
-                firstName: '',
-                lastName: ''
-              }
-            };
-          }
-          
-          // Create a development response to prevent signup failures
-          return {
-            ...response.data,
-            token: devToken
-          };
-        }
-        
+        logApiCall('POST', endpoint, { email: userData.email, role: userData.role });
+        const response = await apiClient.post(endpoint, userData);
         // Store token and user info
-        localStorage.setItem('token', token);
+        localStorage.setItem('token', response.data.token);
         return response.data;
       } catch (error) {
-        console.error('Signup error details:', error);
-        ErrorHandler.logError(error as Error, `Signup failed: ${userData.email}`);
+        ErrorHandler.logError(error as Error);
         throw error;
       }
-    },// Utility method to check authentication status
+    },    // Utility method to check authentication status
     checkAuthStatus: async (): Promise<{ isAuthenticated: boolean } | null> => {
       try {
-        const endpoint = API_ENDPOINTS.AUTH.STATUS;
-        console.log(`Checking auth status at: ${endpoint}`);
-        const response = await apiClient.get(endpoint);
+        const response = await apiClient.get(API_ENDPOINTS.AUTH.STATUS);
         return response.data;
-      } catch (error: unknown) {
-        console.error('Auth status check failed:', error);
+      } catch (_error: unknown) {
         // Clear token if not valid
         localStorage.removeItem('token');
         return null;

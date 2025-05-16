@@ -4,7 +4,7 @@ import { LoggingService } from '../services/loggingService';
 import { ErrorHandler } from '../utils/errorHandler';
 
 // Define user roles with more specificity
-export type UserRole = 'teacher' | 'parent' | 'school' | 'admin' | null;
+export type UserRole = 'teacher' | 'parent' | 'school' | 'admin' | 'unknown' | null;
 
 // Profile interface
 export interface UserProfile {
@@ -27,9 +27,7 @@ export interface SignupData {
   password: string;
   role: UserRole;
   profile?: UserProfile;
-}
-
-// Authentication Context Interface
+}  // Authentication Context Interface
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
@@ -37,7 +35,7 @@ interface AuthContextType {
   login: (email: string, password: string, role: UserRole) => Promise<void>;
   signup: (userData: SignupData) => Promise<void>;
   logout: () => void;
-  loginWithGoogle: (role: UserRole) => Promise<void>;
+  loginWithGoogle: (role: UserRole) => Promise<boolean>; // Returns success status
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -159,22 +157,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithGoogle = async (role: UserRole) => {
+  const loginWithGoogle = async (role: UserRole): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Simulate or integrate actual Google login
-      const googleResponse = await ApiService.login(
-        `${role ?? 'unknown'}_${Date.now()}@gmail.com`, 
-        'google_token', 
-        role ?? 'unknown'
-      );
+      // Use simpler implementation for now
+      const googleResponse = await ApiService.googleLogin(role ?? 'unknown');
       
+      if (!googleResponse || !googleResponse.token || !googleResponse.user) {
+        throw new Error('Invalid response from Google login');
+      }
+      
+      if (!googleResponse || !googleResponse.user) {
+        LoggingService.error(new Error('Invalid Google login response'), { 
+          context: 'user_google_login_attempt', 
+          role: role 
+        });
+        return false;
+      }
+
       const userData: User = {
         id: googleResponse.user.id,
         email: googleResponse.user.email,
         role: role,
         profile: {
-          firstName: 'Google User'
+          firstName: 'Google User',
+          lastName: ''
         }
       };
 
@@ -183,6 +190,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       // Store user data
       localStorage.setItem('user', JSON.stringify(userData));
+      localStorage.setItem('token', googleResponse.token);
       
       // Log Google login event
       LoggingService.trackEvent('user_google_login', { role: role ?? 'unknown' });
@@ -191,6 +199,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: userData.email,
         role: userData.role ?? undefined
       });
+      
+      return true; // Return success status
     } catch (error) {
       // Log Google login failure
       LoggingService.error(error as Error, { 

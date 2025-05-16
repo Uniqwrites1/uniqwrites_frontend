@@ -1,7 +1,14 @@
 import React, { Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route
+} from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { ErrorHandler } from "./utils/errorHandler";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import RedirectIfAuthenticated from "./components/auth/RedirectIfAuthenticated";
+import AuthRedirect from "./components/auth/AuthRedirect";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -24,7 +31,12 @@ import RoleSignup from "./pages/RoleSignup";
 import TeacherDashboard from "./pages/teacher/TeacherDashboard";
 import JobBoard from "./pages/teacher/job-board";
 import ParentDashboard from "./pages/parent/ParentDashboard";
+import SchoolDashboard from "./pages/school/SchoolDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import LoginRedirect from "./pages/LoginRedirect";
+import NotFound from "./pages/NotFound";
+import Unauthorized from "./pages/Unauthorized";
+import AuthStatusTester from "./pages/AuthStatusTester";
 
 // Create Error Boundary for Global Error Handling
 const GlobalErrorFallback: React.FC<{error: Error | null}> = ({ error }) => {
@@ -79,15 +91,62 @@ function App() {
                 <Route path="/initiatives/backtoschool/volunteer" element={<BackToSchoolVolunteer />} />
                 
                 {/* Authentication Routes */}
-                <Route path="/auth" element={<Authentication />} />
-                <Route path="/login/:role" element={<RoleLogin />} />
-                <Route path="/signup/:role" element={<RoleSignup />} />
+                <Route path="/auth" element={
+                  <RedirectIfAuthenticated>
+                    <Authentication />
+                  </RedirectIfAuthenticated>
+                } />
+                <Route path="/login" element={
+                  <RedirectIfAuthenticated>
+                    <LoginRedirect />
+                  </RedirectIfAuthenticated>
+                } />
+                <Route path="/login/redirect" element={<AuthRedirect />} />
+                <Route path="/login/:role" element={
+                  <RedirectIfAuthenticated>
+                    <RoleLogin />
+                  </RedirectIfAuthenticated>
+                } />
+                <Route path="/signup/:role" element={
+                  <RedirectIfAuthenticated>
+                    <RoleSignup />
+                  </RedirectIfAuthenticated>
+                } />
                 
-                {/* Dashboard Routes */}
-                <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-                <Route path="/teacher/job-board" element={<JobBoard />} /> {/* Add this route */}
-                <Route path="/parent/dashboard" element={<ParentDashboard />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                {/* Protected Dashboard Routes */}
+                <Route path="/teacher/dashboard" element={
+                  <ProtectedRoute allowedRoles={['teacher']}>
+                    <TeacherDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/teacher/job-board" element={
+                  <ProtectedRoute allowedRoles={['teacher']}>
+                    <JobBoard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/parent/dashboard" element={
+                  <ProtectedRoute allowedRoles={['parent']}>
+                    <ParentDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/school/dashboard" element={
+                  <ProtectedRoute allowedRoles={['school']}>
+                    <SchoolDashboard />
+                  </ProtectedRoute>
+                } />
+                <Route path="/admin/dashboard" element={
+                  <ProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                } />
+                
+                {/* Test and Debug Routes */}
+                <Route path="/auth-test" element={<AuthStatusTester />} />
+                
+                {/* Testing and Error Routes */}
+                <Route path="/auth-test" element={<AuthStatusTester />} />
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
             <Footer />

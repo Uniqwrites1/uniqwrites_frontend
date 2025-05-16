@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+// Will be used when implementing auth functionality
+// import { useAuth } from '../../hooks/useAuth';
 
 interface ParentProfile {
   firstName: string;
@@ -16,7 +17,8 @@ interface ParentProfile {
 
 const ParentOnboarding: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  // Current user data will be needed when implementing profile submission
+  // const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [profile, setProfile] = useState<ParentProfile>({

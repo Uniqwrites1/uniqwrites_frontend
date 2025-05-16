@@ -9,7 +9,7 @@ import {
   Menu, 
   X 
 } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import DashboardLayout from '../../layouts/DashboardLayout';
 
 // Sidebar Component
 const Sidebar = ({ 
@@ -65,8 +65,6 @@ const Sidebar = ({
 
 // Dashboard Sections
 const DashboardSection = () => {
-  const { user } = useAuth();
-  
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {/* Welcome Message */}
@@ -124,7 +122,6 @@ const DashboardSection = () => {
 const ParentDashboard: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('dashboard');
-  const { logout } = useAuth();
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -153,4 +150,12 @@ const ParentDashboard: React.FC = () => {
   );
 };
 
-export default ParentDashboard;
+const ParentDashboardWithLayout = () => {
+  return (
+    <DashboardLayout requiredRole="parent">
+      <ParentDashboard />
+    </DashboardLayout>
+  );
+};
+
+export default ParentDashboardWithLayout;

@@ -1,13 +1,18 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Authentication: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the redirect path from state if it exists
+  const from = location.state?.from || '/';
 
   const roles = [
-    { name: 'Teacher', path: '/login/teacher' },
-    { name: 'Parent/Guardian', path: '/login/parent' },
-    { name: 'School Admin', path: '/SchoolServiceRequestForm' }
+    { name: 'Teacher', path: '/login/teacher', dashboardPath: '/teacher/dashboard' },
+    { name: 'Parent/Guardian', path: '/login/parent', dashboardPath: '/parent/dashboard' },
+    { name: 'School Admin', path: '/login/school', dashboardPath: '/school/dashboard' },
+    { name: 'Admin', path: '/login/admin', dashboardPath: '/admin/dashboard' }
   ];
 
   return (
@@ -19,7 +24,7 @@ const Authentication: React.FC = () => {
           {roles.map((role) => (
             <button
               key={role.name}
-              onClick={() => navigate(role.path)}
+              onClick={() => navigate(role.path, { state: { from, targetDashboard: role.dashboardPath } })}
               className="w-full bg-yellow-400 text-black py-3 rounded-lg hover:bg-yellow-500 transition-colors"
             >
               Login as {role.name}

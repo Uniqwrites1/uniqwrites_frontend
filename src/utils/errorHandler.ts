@@ -1,89 +1,114 @@
-// Explicitly import React
-import * as React from 'react';
+import React from 'react';
+import { AxiosError } from 'axios';
 
-// Error Handler Utility
-export class ErrorHandler {
-  // Log errors to a centralized logging service
-  static logError(error: Error, context?: unknown): void {
-    console.error('Uniqwrites Error:', {
-      message: error.message,
-      name: error.name,
-      stack: error.stack,
-      context
-    });
-
-    // In a real app, you'd send this to a logging service like Sentry
-    // Sentry.captureException(error);
-  }
-
-  // User-friendly error messages
-  static getUserFriendlyMessage(error: Error): string {
-    switch(error.name) {
-      case 'NetworkError':
-        return 'Unable to connect. Please check your internet connection.';
-      case 'AuthError':
-        return 'Authentication failed. Please try again.';
-      case 'ValidationError':
-        return 'Invalid input. Please check your information.';
-      default:
-        return 'An unexpected error occurred. Please try again later.';
-    }
-  }
-
-  // Error boundary for React components
-  static createErrorBoundary(
-    fallbackComponent?: React.ComponentType<{error: Error | null}>
-  ): React.ComponentClass<{children: React.ReactNode}> {
-    return class ErrorBoundary extends React.Component<
-      { children: React.ReactNode }, 
-      { hasError: boolean; error: Error | null }
-    > {
-      constructor(props: { children: React.ReactNode }) {
-        super(props);
-        this.state = { hasError: false, error: null };
-      }
-
-      static getDerivedStateFromError(error: Error): { hasError: boolean; error: Error } {
-        return { hasError: true, error };
-      }
-
-      componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
-        ErrorHandler.logError(error, errorInfo);
-      }
-
-      render(): React.ReactNode {
-        if (this.state.hasError) {
-          if (fallbackComponent) {
-            const FallbackComponent = fallbackComponent;
-            return React.createElement(FallbackComponent, { error: this.state.error });
-          }
-          return React.createElement('h1', null, 'Something went wrong.');
-        }
-
-        return this.props.children;
-      }
-    };
+// Basic error types
+export class APIError extends Error {
+  constructor(
+    public message: string,
+    public status?: number,
+    public code?: string
+  ) {
+    super(message);
+    this.name = 'APIError';
   }
 }
 
-// Generic error types
 export class NetworkError extends Error {
-  constructor(message: string) {
+  constructor(message = 'Network error occurred') {
     super(message);
     this.name = 'NetworkError';
   }
 }
 
-export class AuthenticationError extends Error {
-  constructor(message: string) {
+export class AuthError extends Error {
+  constructor(message = 'Authentication error occurred') {
     super(message);
     this.name = 'AuthError';
   }
 }
 
 export class ValidationError extends Error {
-  constructor(message: string) {
+  constructor(message: string, public field?: string) {
     super(message);
     this.name = 'ValidationError';
   }
 }
+
+// Error Handler Utility
+export class ErrorHandler {
+  static logError(error: Error | unknown, context?: string): void {
+    const errorDetails = {
+      timestamp: new Date().toISOString(),
+      context,
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : 'UnknownError',
+      stack: error instanceof Error ? error.stack : undefined,
+    };
+
+    // In development, log to console
+    if (import.meta.env.DEV) {
+      console.error('[Error]:', errorDetails);
+    }
+  }
+
+  static getUserFriendlyMessage(error: Error | unknown): string {
+    if (error instanceof NetworkError) {
+      return 'Unable to connect to the server. Please check your internet connection.';
+    }
+    if (error instanceof AuthError) {
+      return 'Your session has expired. Please login again.';
+    }
+    if (error instanceof ValidationError) {
+      return `Invalid input: ${error.message}`;
+    }
+    if (error instanceof APIError) {
+      return error.message;
+    }
+    if (error instanceof Error) {
+      return error.message;
+    }
+    return 'An unexpected error occurred. Please try again later.';
+  }
+
+  // Error Boundary Creator
+  static createErrorBoundary(FallbackComponent: React.ComponentType<{ error: Error | null }>): React.ComponentClass<{ children: React.ReactNode }> {
+    return class ErrorBoundary extends React.Component<
+      { children: React.ReactNode },
+      { error: Error | null }
+    > {
+      constructor(props: { children: React.ReactNode }) {
+        super(props);
+        this.state = { error: null };
+      }
+
+      static getDerivedStateFromError(error: Error) {
+        return { error };
+      }      // Using React.ErrorInfo but only needing the error parameter
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      componentDidCatch(error: Error, _errorInfo: React.ErrorInfo) {
+        ErrorHandler.logError(error, 'React Error Boundary');
+      }
+
+      render() {
+        if (this.state.error) {
+          return React.createElement(FallbackComponent, { error: this.state.error });
+        }
+        return this.props.children;
+      }
+    };
+  }
+}
+
+// API Error Handler
+export const handleAPIError = (error: unknown): never => {
+  if (error instanceof AxiosError) {
+    const message = error.response?.data?.message || 'An unexpected error occurred';
+    throw new APIError(message, error.response?.status, error.response?.data?.code);
+  }
+
+  if (error instanceof Error) {
+    throw new APIError(error.message);
+  }
+
+  throw new APIError('An unexpected error occurred');
+};
