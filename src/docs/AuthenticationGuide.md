@@ -49,6 +49,60 @@ This guide explains the authentication flow in the Uniqwrites application. It co
    - Try using incognito/private browsing mode
 
 4. **Google login issues**:
+   - Make sure you're using a valid Google account
+   - Check if there are popup blockers preventing the Google login window
+   - Ensure the application has a valid Google OAuth client ID
+   - Try clearing browser cache and cookies
+
+## Authentication Implementation
+
+### Traditional Login
+
+The application uses JWT-based authentication:
+
+1. User enters email and password
+2. Frontend sends credentials to `/api/login` endpoint
+3. Backend validates credentials and returns a JWT token
+4. Frontend stores the token in localStorage as 'authToken'
+5. Subsequent API requests include the token in the Authorization header
+
+### Google OAuth Login
+
+The application supports Google OAuth through the `@react-oauth/google` package:
+
+1. User clicks "Continue with Google" button
+2. Google OAuth popup opens for authentication
+3. Google returns a credential token
+4. Frontend sends this token to `/api/google/login` endpoint along with the desired role
+5. Backend validates the Google token, creates a user account if needed, and returns a JWT token
+6. Frontend stores the token in localStorage as 'authToken'
+
+### Password Reset
+
+The application supports password reset functionality:
+
+1. User clicks "Forgot Password?" button
+2. User enters their email address
+3. Frontend sends the email to `/api/forgot-password` endpoint
+4. Backend generates a password reset token and sends an email with a reset link
+5. User receives the email and clicks the reset link
+6. User is directed to a password reset page where they can set a new password
+
+## Token Management
+
+- JWT tokens are stored in localStorage as 'authToken'
+- Refresh tokens are stored in localStorage as 'refreshToken' (when available)
+- The `authService` in `src/services/authService.ts` handles token management
+- Token expiration is monitored with automatic refresh when needed
+
+## Google OAuth Configuration
+
+To use Google OAuth:
+
+1. Set up a Google Cloud project
+2. Configure the OAuth consent screen
+3. Create OAuth 2.0 Client ID credentials
+4. Add the Client ID to your `.env` file as `VITE_GOOGLE_CLIENT_ID`
    - Ensure popup blockers are disabled
    - Try a different browser
    - Check if third-party cookies are enabled

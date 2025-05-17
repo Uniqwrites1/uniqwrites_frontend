@@ -35,7 +35,7 @@ interface AuthContextType {
   login: (email: string, password: string, role: UserRole) => Promise<void>;
   signup: (userData: SignupData) => Promise<void>;
   logout: () => void;
-  loginWithGoogle: (role: UserRole) => Promise<boolean>; // Returns success status
+  loginWithGoogle: (role: UserRole, googleCredential?: string) => Promise<boolean>; // Returns success status
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -157,18 +157,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginWithGoogle = async (role: UserRole): Promise<boolean> => {
+  const loginWithGoogle = async (role: UserRole, googleCredential?: string): Promise<boolean> => {
     setIsLoading(true);
     try {
-      // Use simpler implementation for now
-      const googleResponse = await ApiService.googleLogin(role ?? 'unknown');
+      // Send the Google credential token and role to the backend
+      const googleResponse = await ApiService.googleLogin(role ?? 'unknown', googleCredential);
       
-      if (!googleResponse || !googleResponse.token || !googleResponse.user) {
-        throw new Error('Invalid response from Google login');
+      if (!googleResponse || !googleResponse.success || !googleResponse.token) {
+        throw new Error(googleResponse?.message || 'Invalid response from Google login');
       }
       
-      if (!googleResponse || !googleResponse.user) {
-        LoggingService.error(new Error('Invalid Google login response'), { 
+      if (!googleResponse.user) {
+        LoggingService.error(new Error('Invalid Google login response - missing user data'), { 
           context: 'user_google_login_attempt', 
           role: role 
         });
@@ -188,9 +188,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(userData);
       setIsAuthenticated(true);
       
-      // Store user data
+      // Store user data and token
       localStorage.setItem('user', JSON.stringify(userData));
-      localStorage.setItem('token', googleResponse.token);
+      localStorage.setItem('authToken', googleResponse.token);
+      
+      // Store additional user information if available
+      if (googleResponse.role) {
+        localStorage.setItem('userRole', googleResponse.role);
+      }
+      
+      if (googleResponse.name) {
+        localStorage.setItem('userName', googleResponse.name);
+      }
+      
+      if (googleResponse.email) {
+        localStorage.setItem('userEmail', googleResponse.email);
+      }
       
       // Log Google login event
       LoggingService.trackEvent('user_google_login', { role: role ?? 'unknown' });

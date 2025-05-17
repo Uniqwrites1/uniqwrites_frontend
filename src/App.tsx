@@ -4,8 +4,12 @@ import {
   Routes, 
   Route
 } from "react-router-dom";
+import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from "./context/AuthContext";
 import { ErrorHandler } from "./utils/errorHandler";
+
+// Import environment variables
+import { GOOGLE_CLIENT_ID } from './config/env';
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import RedirectIfAuthenticated from "./components/auth/RedirectIfAuthenticated";
 import AuthRedirect from "./components/auth/AuthRedirect";
@@ -62,11 +66,12 @@ const GlobalErrorBoundary = ErrorHandler.createErrorBoundary(GlobalErrorFallback
 function App() {
   return (
     <React.StrictMode>
-    <GlobalErrorBoundary>
-      <AuthProvider>
-        <Router>
-          <div className="min-h-screen bg-white flex flex-col">
-            <Navbar />
+      <GlobalErrorBoundary>
+        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+          <AuthProvider>
+            <Router>
+              <div className="min-h-screen bg-white flex flex-col">
+                <Navbar />
             <Suspense fallback={
               <div className="flex justify-center items-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-black"></div>
@@ -150,10 +155,11 @@ function App() {
               </Routes>
             </Suspense>
             <Footer />
-          </div>
-        </Router>
-      </AuthProvider>
-    </GlobalErrorBoundary>
+              </div>
+            </Router>
+          </AuthProvider>
+        </GoogleOAuthProvider>
+      </GlobalErrorBoundary>
     </React.StrictMode>
   );
 }

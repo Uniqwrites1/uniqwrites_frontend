@@ -32,10 +32,8 @@ const TeacherOnboarding: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      // TODO: Implement profile update logic with Supabase
+    setIsLoading(true);    try {
+      // TODO: Implement profile update logic with PostgreSQL via API
       navigate('/teacher/dashboard');
     } catch (error) {
       console.error('Failed to update profile:', error);

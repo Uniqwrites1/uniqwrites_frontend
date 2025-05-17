@@ -11,14 +11,21 @@ declare global {
 }
 
 interface LoginResponse {
+  success: boolean;
   token: string;
+  message?: string;
   refreshToken?: string;
   user: User;
+  role?: string;
+  name?: string;
+  email?: string;
   expiresIn?: number;
 }
 
 interface RefreshTokenResponse {
+  success: boolean;
   token: string;
+  message?: string;
   refreshToken?: string;
   expiresIn?: number;
 }
@@ -30,6 +37,10 @@ export const authService = {  async login(email: string, password: string, role:
         password,
         role
       });
+      
+      if (response.data.success === false) {
+        throw new Error(response.data.message || 'Login failed');
+      }
       
       if (response.data.token) {
         this.setSession(response.data);
@@ -55,19 +66,41 @@ export const authService = {  async login(email: string, password: string, role:
       ErrorHandler.logError(error);
       throw error;
     }
-  },
-  logout(): void {
+  },  logout(): void {
+    // Remove all auth-related data
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
     localStorage.removeItem('tokenExpiry');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
     
     // Remove the Authorization header
     if (api.defaults.headers) {
       delete api.defaults.headers.common['Authorization'];
     }
   },setSession(authResponse: LoginResponse): void {
+    // Check if response was successful
+    if (!authResponse.success && authResponse.message) {
+      console.error(`Authentication error: ${authResponse.message}`);
+      return;
+    }
+    
     localStorage.setItem('authToken', authResponse.token);
+    
+    // Store additional user information if available
+    if (authResponse.role) {
+      localStorage.setItem('userRole', authResponse.role);
+    }
+    
+    if (authResponse.name) {
+      localStorage.setItem('userName', authResponse.name);
+    }
+    
+    if (authResponse.email) {
+      localStorage.setItem('userEmail', authResponse.email);
+    }
     
     // Configure future requests to use this token
     if (api.defaults.headers) {
@@ -88,6 +121,7 @@ export const authService = {  async login(email: string, password: string, role:
       this.startTokenExpiryMonitor();
     }
     
+    // Continue storing full user object for backward compatibility
     localStorage.setItem('user', JSON.stringify(authResponse.user));
   },
   
@@ -197,9 +231,8 @@ export const authService = {  async login(email: string, password: string, role:
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;
   },
-
   isAuthenticated(): boolean {
-    return !!localStorage.getItem('token') && !this.isTokenExpired();
+    return !!localStorage.getItem('authToken') && !this.isTokenExpired();
   },  getToken(): string | null {
     // First check if token is expired
     if (this.isTokenExpired()) {
@@ -208,15 +241,27 @@ export const authService = {  async login(email: string, password: string, role:
     }
     return localStorage.getItem('authToken');
   },
-  
   async sendPasswordResetEmail(email: string): Promise<void> {
     try {
+      // Using the updated endpoint that matches the backend's Option 1
       await api.post(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
     } catch (error) {
       ErrorHandler.logError(error);
       throw error;
     }
-  },  async checkAuthStatus(): Promise<{ isAuthenticated: boolean; user?: User }> {
+  },
+    async resetPassword(token: string, newPassword: string): Promise<void> {
+    try {
+      // Reset password endpoint from API_ENDPOINTS
+      await api.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, {
+        token,
+        newPassword
+      });
+    } catch (error) {
+      ErrorHandler.logError(error);
+      throw error;
+    }
+  },async checkAuthStatus(): Promise<{ isAuthenticated: boolean; user?: User }> {
     try {
       // First check if we even have a token
       const token = localStorage.getItem('authToken');

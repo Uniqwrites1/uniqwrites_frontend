@@ -6,17 +6,18 @@
 // Base API URL from environment or default to backend URL
 export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-// Auth endpoints - using direct paths as recommended
+// Auth endpoints - using API prefixed paths (Option 2)
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: '/login',
-    SIGNUP: '/signup',
-    REFRESH: '/refresh-token',
-    LOGOUT: '/logout',
-    STATUS: '/auth-status',
-    FORGOT_PASSWORD: '/forgot-password',
-    GOOGLE_LOGIN: '/google/login',
-    GOOGLE_CALLBACK: '/google/callback'
+    LOGIN: '/api/login',
+    SIGNUP: '/api/signup',
+    REFRESH: '/api/refresh-token',
+    LOGOUT: '/api/logout',
+    STATUS: '/api/auth-status',
+    FORGOT_PASSWORD: '/api/auth/request-password-reset',
+    RESET_PASSWORD: '/api/auth/reset-password',
+    GOOGLE_LOGIN: '/api/google/login',
+    GOOGLE_CALLBACK: '/api/google/callback'
   },
   TEACHER: {
     REGISTER: '/teachers/register',

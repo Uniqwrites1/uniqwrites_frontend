@@ -24,6 +24,11 @@ interface LoginResponse {
   refreshToken?: string;
   user: User;
   expiresIn?: number;
+  success?: boolean;
+  message?: string;
+  role?: string;
+  name?: string;
+  email?: string;
 }
 
 // Remove local type declarations as they are now imported from ../types/api
@@ -38,12 +43,10 @@ const apiClient = axios.create({
   },
   // Add withCredentials for cookie-based auth (if used by your backend)
   withCredentials: true
-});
-
-// Request Interceptor for adding authentication token
+});  // Request Interceptor for adding authentication token
   apiClient.interceptors.request.use(
     config => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       if (token) {
         config.headers['Authorization'] = `Bearer ${token}`;
       }
@@ -75,9 +78,8 @@ const apiClient = axios.create({
         switch (error.response.status) {
           case 400:
             throw new Error(`Bad Request: ${errorDetails || 'Invalid data'}`);          case 401: {
-            // Handle unauthorized error (token expired or invalid)
-            // First, remove the token
-            localStorage.removeItem('token');
+            // Handle unauthorized error (token expired or invalid)            // First, remove the token
+            localStorage.removeItem('authToken');
             
             // Rather than redirecting immediately, check if we're in the middle of authentication
             const isAuthPath = window.location.pathname.includes('/login') || 
@@ -156,8 +158,7 @@ const apiClient = axios.create({
         throw error;
       }
     },    // Authentication Services
-    login: async (email: string, password: string, role: string): Promise<LoginResponse> => {
-      try {
+    login: async (email: string, password: string, role: string): Promise<LoginResponse> => {      try {
         const endpoint = API_ENDPOINTS.AUTH.LOGIN;
         logApiCall('POST', endpoint, { email, role });
         
@@ -179,7 +180,7 @@ const apiClient = axios.create({
         }
         
         // Store token and user info
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('authToken', response.data.token);
         return response.data;
       } catch (error) {
         console.error('Login error details:', error);
@@ -187,17 +188,15 @@ const apiClient = axios.create({
         throw error;
       }
     },
-    
-    // Google Authentication
-    googleLogin: async (role: string): Promise<LoginResponse> => {
+      // Google Authentication
+    googleLogin: async (role: string, credential?: string): Promise<LoginResponse> => {
       try {
         const endpoint = API_ENDPOINTS.AUTH.GOOGLE_LOGIN;
-        logApiCall('POST', endpoint, { role });
+        logApiCall('POST', endpoint, { role, hasCredential: !!credential });
         
         const payload = {
           role: role || 'unknown',
-          // Include any necessary Google authentication data
-          googleAuthType: 'login'
+          credential: credential // Include the Google ID token
         };
         
         console.log('Sending Google login request to:', endpoint);
@@ -209,7 +208,13 @@ const apiClient = axios.create({
         }
         
         // Store token and user info
-        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('authToken', response.data.token);
+        
+        // Configure future requests to use this token
+        if (apiClient.defaults.headers) {
+          apiClient.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+        }
+        
         return response.data;
       } catch (error) {
         console.error('Google login error details:', error);
@@ -227,11 +232,11 @@ const apiClient = axios.create({
           role: userData.role || 'unknown'
         };
         
-        logApiCall('POST', endpoint, { email: cleanedData.email, role: cleanedData.role });
-        console.log('Sending signup request to:', endpoint);
+        logApiCall('POST', endpoint, { email: cleanedData.email, role: cleanedData.role });        console.log('Sending signup request to:', endpoint);
         console.log('Signup payload:', { email: cleanedData.email, role: cleanedData.role });
-          const response = await apiClient.post(endpoint, cleanedData);
-          // More flexible response validation
+        const response = await apiClient.post(endpoint, cleanedData);
+        
+        // More flexible response validation
         if (!response.data) {
           throw new Error('Invalid response from server: Empty response data');
         }
@@ -241,8 +246,8 @@ const apiClient = axios.create({
           console.log('Server returned string response:', response.data);
           // Create placeholder data for development
           const devToken = `dev_token_${Date.now()}`;
-          localStorage.setItem('token', devToken);
-            return {
+          localStorage.setItem('authToken', devToken);
+          return {
             token: devToken,
             user: {
               id: `user_${Date.now()}`,
@@ -250,8 +255,7 @@ const apiClient = axios.create({
               role: cleanedData.role,
               profile: {
                 firstName: '',
-                lastName: ''
-              }
+                lastName: ''              }
             }
           };
         }
@@ -265,7 +269,7 @@ const apiClient = axios.create({
           console.warn('Warning: Response missing token data', response.data);
           // Create a placeholder token for development purposes
           const devToken = `dev_token_${Date.now()}`;
-          localStorage.setItem('token', devToken);
+          localStorage.setItem('authToken', devToken);
           
           // Add mock user data if missing
           if (!response.data.user) {
@@ -279,8 +283,7 @@ const apiClient = axios.create({
               }
             };
           }
-          
-          // Create a development response to prevent signup failures
+            // Create a development response to prevent signup failures
           return {
             ...response.data,
             token: devToken
@@ -288,7 +291,7 @@ const apiClient = axios.create({
         }
         
         // Store token and user info
-        localStorage.setItem('token', token);
+        localStorage.setItem('authToken', token);
         return response.data;
       } catch (error) {
         console.error('Signup error details:', error);
@@ -303,9 +306,8 @@ const apiClient = axios.create({
         const response = await apiClient.get(endpoint);
         return response.data;
       } catch (error: unknown) {
-        console.error('Auth status check failed:', error);
-        // Clear token if not valid
-        localStorage.removeItem('token');
+        console.error('Auth status check failed:', error);        // Clear token if not valid
+        localStorage.removeItem('authToken');
         return null;
       }
     }

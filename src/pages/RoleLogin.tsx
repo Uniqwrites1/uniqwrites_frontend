@@ -4,6 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { UserRole } from '../context/AuthContext';
 import { getDashboardUrl } from '../utils/authUtils';
 import { authService } from '../services/authService';
+import GoogleLoginButton from '../components/auth/GoogleLoginButton';
 
 const RoleLogin: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -11,8 +12,9 @@ const RoleLogin: React.FC = () => {
   const [error, setError] = useState('');
   const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState(false);
   const { role } = useParams<{ role: string }>();
-  const { login, loginWithGoogle } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const validRole = role as UserRole;
@@ -45,25 +47,13 @@ const RoleLogin: React.FC = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      const success = await loginWithGoogle(role as UserRole);
-      
-      if (success) {
-        // After successful login, navigate to the target dashboard or the default dashboard for the role
-        if (targetDashboard) {
-          navigate(targetDashboard);
-        } else {
-          // Use the utility function to get the appropriate dashboard URL
-          navigate(getDashboardUrl(role as UserRole));
-        }
-      } else {
-        setError('Google login failed');
-      }
-    } catch (error) {
-      setError('Google login failed');
-      console.error('Google Login failed', error);
-    }
+  const handleGoogleSuccess = () => {
+    // This is handled inside the GoogleLoginButton component
+    setError('');
+  };
+
+  const handleGoogleError = (errorMessage: string) => {
+    setError(errorMessage);
   };
   
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -80,7 +70,7 @@ const RoleLogin: React.FC = () => {
       await authService.sendPasswordResetEmail(forgotPasswordEmail);
       setShowForgotPassword(false);
       // Show success message
-      alert('Password reset instructions have been sent to your email');
+      setForgotPasswordSuccess(true);
     } catch (error) {
       setError('Failed to send password reset email. Please try again.');
       console.error('Forgot password failed:', error);
@@ -97,6 +87,12 @@ const RoleLogin: React.FC = () => {
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
             {error}
+          </div>
+        )}
+
+        {forgotPasswordSuccess && (
+          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4" role="alert">
+            Password reset instructions have been sent to your email.
           </div>
         )}
         
@@ -126,7 +122,10 @@ const RoleLogin: React.FC = () => {
           <div className="text-center mt-2">
             <button
               type="button"
-              onClick={() => setShowForgotPassword(true)}
+              onClick={() => {
+                setShowForgotPassword(true);
+                setForgotPasswordSuccess(false);
+              }}
               className="text-yellow-300 text-sm underline hover:text-yellow-200"
             >
               Forgot Password?
@@ -166,18 +165,11 @@ const RoleLogin: React.FC = () => {
 
         <div className="text-center mt-4">
           <p className="text-yellow-300 text-sm mb-2">Or login with</p>
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full bg-white text-black py-3 rounded-lg flex items-center justify-center space-x-2 hover:bg-gray-100"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
-              <path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303c-1.649 4.657-6.08 8-11.303 8-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 12.955 4 4 12.955 4 24s8.955 20 20 20 20-8.955 20-20c0-1.341-.138-2.65-.389-3.917z"/>
-              <path fill="#FF3D00" d="m6.306 14.691 6.571 4.819C14.655 15.108 18.961 12 24 12c3.059 0 5.842 1.154 7.961 3.039l5.657-5.657C34.046 6.053 29.268 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/>
-              <path fill="#4CAF50" d="M24 44c5.166 0 9.86-1.977 13.409-5.192l-6.19-5.238A11.91 11.91 0 0 1 24 36c-5.202 0-9.619-3.317-11.283-7.946l-6.522 5.025C9.505 39.556 16.227 44 24 44z"/>
-              <path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303a12.04 12.04 0 0 1-4.087 5.571l.002-.001 6.19 5.238C36.971 39.205 44 34 44 24c0-1.341-.138-2.65-.389-3.917z"/>
-            </svg>
-            <span>Continue with Google</span>
-          </button>
+          <GoogleLoginButton 
+            role={validRole} 
+            onSuccess={handleGoogleSuccess}
+            onError={handleGoogleError}
+          />
         </div>
 
         <div className="text-center mt-6">

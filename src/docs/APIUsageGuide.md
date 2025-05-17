@@ -5,22 +5,29 @@ This guide provides examples and best practices for working with the Uniqwrites 
 ## Current Configuration
 
 The frontend is configured to communicate with the backend running at:
-```
+
+```bash
 http://localhost:8080
 ```
 
 ## Authentication Endpoints
 
-Our application uses direct path authentication endpoints as recommended:
+The backend supports three patterns for authentication endpoints to be flexible with frontend implementations. Our application currently uses Option 2 (API Prefixed Paths):
 
-| Action | Endpoint | Method |
+### Available Authentication Endpoint Patterns
+
+1. **Direct Paths**: `/login`, `/signup`, etc.
+2. **API Prefixed Paths**: `/api/login`, `/api/signup`, etc. **(Current Configuration)**
+3. **API Auth Prefixed Paths**: `/api/auth/login`, `/api/auth/signup`, etc.
+
+| Action | Current Endpoint | Method |
 |--------|----------|--------|
-| Login | `/login` | POST |
-| Signup | `/signup` | POST |
-| Google Login | `/google/login` | POST |
-| Forgot Password | `/forgot-password` | POST |
-| Refresh Token | `/refresh-token` | POST |
-| Logout | `/logout` | POST |
+| Login | `/api/login` | POST |
+| Signup | `/api/signup` | POST |
+| Google Login | `/api/google/login` | POST |
+| Forgot Password | `/api/forgot-password` | POST |
+| Refresh Token | `/api/refresh-token` | POST |
+| Logout | `/api/logout` | POST |
 
 ## Making API Calls
 
@@ -33,8 +40,19 @@ import { authService } from '../services/authService';
 const handleLogin = async (email, password, role) => {
   try {
     const response = await authService.login(email, password, role);
+    // Response structure now includes:
+    // { success: true, token: "...", message: "Login successful", role: "TEACHER", name: "John Doe", email: "john@example.com", user: {...} }
+    
+    if (!response.success) {
+      throw new Error(response.message || 'Login failed');
+    }
+    
     // Success - user is now logged in
-    return response.user;
+    return {
+      user: response.user,
+      role: response.role,
+      name: response.name
+    };
   } catch (error) {
     // Handle login error
     console.error('Login failed:', error);
@@ -49,13 +67,23 @@ const handleSignup = async (userData) => {
       email: userData.email,
       password: userData.password,
       role: userData.role,
+      name: `${userData.firstName} ${userData.lastName}`, // Now sending full name field
       profile: {
         firstName: userData.firstName,
         lastName: userData.lastName
       }
     });
+    
+    if (!response.success) {
+      throw new Error(response.message || 'Signup failed');
+    }
+    
     // Success - user is now registered and logged in
-    return response.user;
+    return {
+      user: response.user,
+      role: response.role,
+      name: response.name
+    };
   } catch (error) {
     // Handle signup error
     console.error('Signup failed:', error);
@@ -113,7 +141,7 @@ const updateUserProfile = async (profileData) => {
 If you encounter CORS errors:
 
 1. Verify the backend is running and accessible
-2. Check that the frontend is running on the expected origin (http://localhost:5173)
+2. Check that the frontend is running on the expected origin (`http://localhost:5173`)
 3. Ensure backend CORS configuration includes your frontend origin
 4. Confirm that `withCredentials: true` is set in the axios config
 
@@ -128,7 +156,33 @@ If authentication fails:
 
 ### Token Handling
 
-Our application stores the JWT token as `authToken` in localStorage and automatically adds it to all API requests through the axios interceptor.
+Our application stores the JWT token and user information as follows:
+
+```typescript
+// After successful login:
+localStorage.setItem('authToken', response.data.token);
+localStorage.setItem('userRole', response.data.role);
+localStorage.setItem('userName', response.data.name);
+localStorage.setItem('userEmail', response.data.email);
+
+// For backward compatibility, we also store the full user object:
+localStorage.setItem('user', JSON.stringify(response.data.user));
+```
+
+The authentication token is automatically added to all API requests through our axios interceptor:
+
+```typescript
+// From our axios.ts interceptor
+instance.interceptors.request.use(
+  (config) => {
+    const token = authService.getToken();
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  }
+);
+```
 
 ## Testing API Endpoints
 
