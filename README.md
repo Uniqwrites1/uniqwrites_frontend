@@ -18,18 +18,18 @@ Uniqwrites is an educational platform connecting teachers, parents, and schools.
 
 ## Environment Configuration
 
-The application uses environment variables for configuration. Create a `.env` file in the project root with the following variables:
+The application uses environment variables for configuration. Create a `.env` file in the project root by copying from `.env.example`:
 
+```bash
+# Copy the example environment file
+cp .env.example .env
 ```
-# API Configuration
-VITE_API_URL=/api
 
-# Authentication
-VITE_JWT_SECRET=your-jwt-secret
+Then update the values in your `.env` file with your specific configuration.
 
-# Google OAuth
-VITE_GOOGLE_CLIENT_ID=your-google-client-id
-```
+> **IMPORTANT SECURITY NOTE**: Never commit your actual `.env` file to version control. It may contain sensitive information. The `.env` file is already in the `.gitignore` file to prevent accidental commits.
+
+For detailed information about environment variables and security best practices, see [Environment Variables Guide](./docs/environment-variables.md).
 
 ## Development
 
