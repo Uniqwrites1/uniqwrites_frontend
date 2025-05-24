@@ -46,13 +46,5 @@ export const router = createBrowserRouter(
       <Route path="/initiatives/literacy/volunteer" element={<LiteracyVolunteer />} />
       <Route path="/initiatives/backtoschool/sponsor" element={<BackToSchoolSponsor />} />
       <Route path="/initiatives/backtoschool/volunteer" element={<BackToSchoolVolunteer />} />
-    </Route>
-  ),
-  {
-  // Enable future flags to address deprecation warnings
-    future: {
-      // These flags must be listed in the FutureConfig interface from react-router
-      // Not setting any explicit flags here since we're using the global window.__reactRouterFutureFlags
-    }
-  }
+    </Route>  )
 );

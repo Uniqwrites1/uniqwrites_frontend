@@ -16,24 +16,36 @@ export interface FormSubmissionEmail {
   formData: Record<string, unknown>;
 }
 
-class EmailService {
-  // Send form submission to admin email
+class EmailService {  // Send form submission to admin email
   async sendFormSubmission(submission: FormSubmissionEmail): Promise<boolean> {
+    console.log('📧 Email Service - Starting form submission:', submission.formType);
+    
     try {
+      console.log('📧 Step 1: Attempting Vercel serverless function...');
       const success = await this.sendViaVercelFunction(submission);
-      if (success) return true;
+      if (success) {
+        console.log('✅ Email sent successfully via Vercel function');
+        return true;
+      }
 
-      console.log('Vercel function failed, trying Formspree fallback...');
-      return await this.sendViaFormspree(submission);
+      console.log('📧 Step 2: Vercel function failed, trying Formspree fallback...');
+      const fallbackSuccess = await this.sendViaFormspree(submission);
+      if (fallbackSuccess) {
+        console.log('✅ Email sent successfully via Formspree fallback');
+        return true;
+      }
+
+      console.log('❌ Both email methods failed');
+      return false;
     } catch (error) {
-      console.error('Failed to send form submission email:', error);
+      console.error('❌ Failed to send form submission email:', error);
       return false;
     }
   }
-
   // Send via Vercel serverless function (recommended)
   private async sendViaVercelFunction(submission: FormSubmissionEmail): Promise<boolean> {
     try {
+      console.log('📧 Vercel Function - Sending to /api/send-email...');
       const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
@@ -52,27 +64,27 @@ class EmailService {
 
       if (!response.ok) {
         const errorData = await response.text().catch(() => 'Unknown error');
-        console.error('Vercel function returned error:', response.status, errorData);
+        console.error('❌ Vercel function returned error:', response.status, errorData);
         return false;
       }
 
       const result = await response.json().catch(() => null);
-      console.log('Email sent successfully via Vercel function:', result);
+      console.log('✅ Email sent successfully via Vercel function:', result);
       return true;
     } catch (error) {
-      console.error('Vercel function submission failed:', error);
+      console.error('❌ Vercel function submission failed:', error);
       return false;
     }
   }
-
   // Send via Formspree (free service fallback)
   private async sendViaFormspree(submission: FormSubmissionEmail): Promise<boolean> {
-    try {
-      if (!formspreeEndpoint) {
-        console.error('Formspree endpoint is not defined in environment variables.');
+    try {      if (!formspreeEndpoint || formspreeEndpoint.includes('YOUR_FORM_ID')) {
+        console.error('❌ Formspree endpoint is not configured. Please create a form at https://formspree.io');
         return false;
       }
 
+      console.log('📧 Formspree - Sending to:', formspreeEndpoint);
+      
       const formData = new FormData();
       formData.append('_replyto', submission.submitterEmail);
       formData.append('_subject', `${this.getSubjectByFormType(submission.formType)} - ${submission.submitterName}`);
@@ -89,9 +101,15 @@ class EmailService {
         }
       });
 
-      return response.ok;
+      if (response.ok) {
+        console.log('✅ Formspree submission successful');
+        return true;
+      } else {
+        console.error('❌ Formspree submission failed:', response.status, await response.text().catch(() => 'Unknown error'));
+        return false;
+      }
     } catch (error) {
-      console.error('Formspree submission failed:', error);
+      console.error('❌ Formspree submission failed:', error);
       return false;
     }
   }
