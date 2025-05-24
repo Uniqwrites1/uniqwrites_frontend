@@ -4,15 +4,9 @@ import {
   Routes, 
   Route
 } from "react-router-dom";
-import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from "./context/AuthContext";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import { ErrorHandler } from "./utils/errorHandler";
-
-// Import environment variables
-import { GOOGLE_CLIENT_ID } from './config/env';
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import RedirectIfAuthenticated from "./components/auth/RedirectIfAuthenticated";
-import AuthRedirect from "./components/auth/AuthRedirect";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -29,18 +23,9 @@ import ParentTutoringRequestForm from "./pages/ParentTutoringRequest";
 import SchoolServiceRequestForm from "./pages/SchoolServiceRequest";
 import PurposeActionPoint from "./pages/PurposeActionPoint";
 import ApplyTutor from "./pages/apply-tutor";
-import Authentication from "./pages/Authentication";
-import RoleLogin from "./pages/RoleLogin";
-import RoleSignup from "./pages/RoleSignup";
-import TeacherDashboard from "./pages/teacher/TeacherDashboard";
-import JobBoard from "./pages/teacher/job-board";
-import ParentDashboard from "./pages/parent/ParentDashboard";
-import SchoolDashboard from "./pages/school/SchoolDashboard";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import LoginRedirect from "./pages/LoginRedirect";
+import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
-import Unauthorized from "./pages/Unauthorized";
-import AuthStatusTester from "./pages/AuthStatusTester";
+
 
 // Create Error Boundary for Global Error Handling
 const GlobalErrorFallback: React.FC<{error: Error | null}> = ({ error }) => {
@@ -67,11 +52,9 @@ function App() {
   return (
     <React.StrictMode>
       <GlobalErrorBoundary>
-        <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-          <AuthProvider>
-            <Router>
-              <div className="min-h-screen bg-white flex flex-col">
-                <Navbar />
+        <Router>
+          <div className="min-h-screen bg-white flex flex-col">
+            <Navbar />
             <Suspense fallback={
               <div className="flex justify-center items-center min-h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-black"></div>
@@ -95,70 +78,28 @@ function App() {
                 <Route path="/initiatives/backtoschool/sponsor" element={<BackToSchoolSponsor />} />
                 <Route path="/initiatives/backtoschool/volunteer" element={<BackToSchoolVolunteer />} />
                 
-                {/* Authentication Routes */}
-                <Route path="/auth" element={
-                  <RedirectIfAuthenticated>
-                    <Authentication />
-                  </RedirectIfAuthenticated>
-                } />
-                <Route path="/login" element={
-                  <RedirectIfAuthenticated>
-                    <LoginRedirect />
-                  </RedirectIfAuthenticated>
-                } />
-                <Route path="/login/redirect" element={<AuthRedirect />} />
-                <Route path="/login/:role" element={
-                  <RedirectIfAuthenticated>
-                    <RoleLogin />
-                  </RedirectIfAuthenticated>
-                } />
-                <Route path="/signup/:role" element={
-                  <RedirectIfAuthenticated>
-                    <RoleSignup />
-                  </RedirectIfAuthenticated>
-                } />
+                {/* Thank You Page for Form Submissions */}
+                <Route path="/thank-you" element={<ThankYou />} />
                 
-                {/* Protected Dashboard Routes */}
-                <Route path="/teacher/dashboard" element={
-                  <ProtectedRoute allowedRoles={['teacher']}>
-                    <TeacherDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/teacher/job-board" element={
-                  <ProtectedRoute allowedRoles={['teacher']}>
-                    <JobBoard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/parent/dashboard" element={
-                  <ProtectedRoute allowedRoles={['parent']}>
-                    <ParentDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/school/dashboard" element={
-                  <ProtectedRoute allowedRoles={['school']}>
-                    <SchoolDashboard />
-                  </ProtectedRoute>
-                } />
-                <Route path="/admin/dashboard" element={
-                  <ProtectedRoute allowedRoles={['admin']}>
-                    <AdminDashboard />
-                  </ProtectedRoute>
-                } />
+                {/* Error Routes */}
                 
-                {/* Test and Debug Routes */}
-                <Route path="/auth-test" element={<AuthStatusTester />} />
-                
-                {/* Testing and Error Routes */}
-                <Route path="/auth-test" element={<AuthStatusTester />} />
-                <Route path="/unauthorized" element={<Unauthorized />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
             <Footer />
-              </div>
-            </Router>
-          </AuthProvider>
-        </GoogleOAuthProvider>
+          </div>
+        </Router>
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
       </GlobalErrorBoundary>
     </React.StrictMode>
   );

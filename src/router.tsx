@@ -19,13 +19,7 @@ import ParentTutoringRequestForm from "./pages/ParentTutoringRequest";
 import SchoolServiceRequestForm from "./pages/SchoolServiceRequest";
 import PurposeActionPoint from "./pages/PurposeActionPoint";
 import ApplyTutor from "./pages/apply-tutor";
-import Authentication from "./pages/Authentication";
-import RoleLogin from "./pages/RoleLogin";
-import RoleSignup from "./pages/RoleSignup";
-import TeacherDashboard from "./pages/teacher/TeacherDashboard";
-import JobBoard from "./pages/teacher/job-board";
-import ParentDashboard from "./pages/parent/ParentDashboard";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+import ThankYou from "./pages/ThankYou";
 import AppLayout from "./layouts/AppLayout";
 
 /**
@@ -41,29 +35,17 @@ export const router = createBrowserRouter(
       <Route path="/about" element={<About />} />
       <Route path="/services" element={<Services />} />
       <Route path="/apply-tutor" element={<ApplyTutor />} />
-      <Route path="/blog" element={<Blog />} />
-      <Route path="/contact" element={<Contact />} />
+      <Route path="/blog" element={<Blog />} />      <Route path="/contact" element={<Contact />} />
+      <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/ParentTutoringRequestForm" element={<ParentTutoringRequestForm />} />
       <Route path="/SchoolServiceRequestForm" element={<SchoolServiceRequestForm />} />
       <Route path="/PurposeActionPoint" element={<PurposeActionPoint />} />
       <Route path="/initiatives" element={<Initiatives />} />
-      
-      {/* Initiative Form Routes */}
+        {/* Initiative Form Routes */}
       <Route path="/initiatives/literacy/sponsor" element={<LiteracySponsor />} />
       <Route path="/initiatives/literacy/volunteer" element={<LiteracyVolunteer />} />
       <Route path="/initiatives/backtoschool/sponsor" element={<BackToSchoolSponsor />} />
       <Route path="/initiatives/backtoschool/volunteer" element={<BackToSchoolVolunteer />} />
-      
-      {/* Authentication Routes */}
-      <Route path="/auth" element={<Authentication />} />
-      <Route path="/login/:role" element={<RoleLogin />} />
-      <Route path="/signup/:role" element={<RoleSignup />} />
-      
-      {/* Dashboard Routes */}
-      <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
-      <Route path="/teacher/job-board" element={<JobBoard />} />
-      <Route path="/parent/dashboard" element={<ParentDashboard />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
     </Route>
   ),
   {

@@ -41,17 +41,19 @@ For detailed information about environment variables and security best practices
 
 ### Running the Development Server
 
-1. Install dependencies:
+- Install dependencies:
+
 ```bash
 npm install
 ```
 
-2. Start the development server:
+- Start the development server:
+
 ```bash
 npm run dev
 ```
 
-3. Open [http://localhost:5173](http://localhost:5173) in your browser.
+- Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ## Authentication
 
@@ -84,6 +86,7 @@ npm run build
 ### Backend Integration
 
 - **API Standardization**: Updated all endpoints to use the `/api/resource` pattern
+- **API URL Configuration**: Fixed API URL handling to prevent duplicate `/api` prefixes in requests
 - **Authentication Flow**: Enhanced token-based authentication with proper refresh mechanisms
 - **Direct Database**: Removed Supabase dependencies in favor of direct PostgreSQL access via API
 

@@ -69,12 +69,11 @@ const HeroBanner = () => {
                 className="block w-full text-left font-bold px-4 py-2 hover:bg-yellow-100 focus:bg-yellow-100 focus:outline-none"
               >
                 Tutors
-              </TutorApplyButton>
-              <button
+              </TutorApplyButton>              <button
                 className="block w-full text-left font-bold px-4 py-2 hover:bg-yellow-100 focus:bg-yellow-100 focus:outline-none"
                 role="menuitem"
-                onClick={() => navigate("/ParentTutoringRequestForm")}                onKeyDown={handleKeyDown}
                 onClick={() => handleMenuItemClick('/ParentTutoringRequestForm')}
+                onKeyDown={handleKeyDown}
               >
                 Parent/Guardians
               </button>

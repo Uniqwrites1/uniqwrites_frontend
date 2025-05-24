@@ -10,12 +10,22 @@ This document explains how to properly set up and secure environment variables f
 ## Required Environment Variables
 
 ### API Configuration
-- `VITE_API_URL`: Base URL for API requests, e.g., `/api` or `https://api.uniqwrites.com`
+
+- `VITE_API_URL`: Base URL for API requests
+  - Development: Use an empty string (`VITE_API_URL=`) to leverage Vite's proxy
+  - Production: Use the full backend URL (e.g., `https://api.uniqwrites.com`)
+  - **Note**: Do NOT use a relative path like `/api` as this can cause duplicate path segments in URLs
+
+- `VITE_ENABLE_API_DEBUG`: Set to `true` to enable detailed API URL construction logs
+  - Useful for debugging API connectivity issues
+  - Example: `VITE_ENABLE_API_DEBUG=true`
 
 ### Authentication
+
 - `VITE_JWT_SECRET`: **IMPORTANT** - This should NOT be used in the frontend code. The JWT secret should only be stored and used on the backend server. The frontend should only receive and send JWTs, never handle the secret itself.
 
 ### Google OAuth
+
 - `VITE_GOOGLE_CLIENT_ID`: Your Google OAuth client ID for authentication features
 
 ## Security Best Practices

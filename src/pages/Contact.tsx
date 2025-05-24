@@ -1,10 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { Phone, Mail, MapPin, MessageSquare } from "lucide-react";
+import { emailService } from "../services/emailService";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Contact = () => {
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
+    setLoading(true);
+
+    try {
+      const formData = new FormData(e.target as HTMLFormElement);
+      const data = {
+        name: formData.get('name') as string,
+        email: formData.get('email') as string,
+        subject: formData.get('subject') as string,
+        message: formData.get('message') as string,
+      };
+
+      const success = await emailService.sendFormSubmission({
+        formType: 'initiative',
+        submitterName: data.name,
+        submitterEmail: data.email,
+        formData: {
+          subject: data.subject,
+          message: data.message,
+          interest: data.subject,
+        }
+      });
+
+      if (success) {
+        toast.success('Message sent successfully! We\'ll get back to you soon.');
+        navigate('/thank-you?type=contact');
+      } else {
+        toast.error('Failed to send message. Please try again.');
+      }
+    } catch (error) {
+      console.error('Contact form submission error:', error);
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -138,9 +177,10 @@ const Contact = () => {
 
                 <button
                   type="submit"
-                  className="w-full bg-primary text-secondary px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors"
+                  disabled={loading}
+                  className="w-full bg-primary text-secondary px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send Message
+                  {loading ? 'Sending...' : 'Send Message'}
                 </button>
               </div>
             </form>

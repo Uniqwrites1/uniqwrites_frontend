@@ -1,17 +1,10 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import logoImage from "../assets/images/Uniqwrites_logo.jpg";
-import { useAuth } from "../hooks/useAuth";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLoginClick = () => {
-    navigate('/auth');
-  };
 
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
@@ -74,26 +67,9 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* CTAs Right */}
+          {/* CTAs Right - Empty for simplified public version */}
           <div className="hidden md:flex md:items-center md:space-x-4">
-            {user ? (
-              <button
-                onClick={() => {
-                  logout();
-                  navigate('/');
-                }}
-                className="bg-primary text-secondary px-4 py-2 rounded-md font-semibold hover:bg-primary-dark transition-colors"
-              >
-                Logout
-              </button>
-            ) : (
-              <button
-                onClick={handleLoginClick}
-                className="bg-primary text-secondary px-4 py-2 rounded-md font-semibold hover:bg-primary-dark transition-colors"
-              >
-                Log In
-              </button>
-            )}
+            {/* Authentication removed for public lite version */}
           </div>
 
           {/* Mobile Menu Button */}
@@ -155,24 +131,7 @@ const Navbar = () => {
             >
               Contact
             </Link>
-            {user ? (
-              <button
-                onClick={() => {
-                  logout();
-                  navigate('/');
-                }}
-                className="block w-full text-left px-3 py-2 bg-primary text-secondary rounded-md font-semibold hover:bg-primary-dark transition-colors"
-              >
-                Logout
-              </button>
-            ) : (
-              <button
-                onClick={handleLoginClick}
-                className="block w-full text-left px-3 py-2 bg-primary text-secondary rounded-md font-semibold hover:bg-primary-dark transition-colors"
-              >
-                Log In
-              </button>
-            )}
+            {/* Authentication removed for public lite version */}
           </div>
         </div>
       )}

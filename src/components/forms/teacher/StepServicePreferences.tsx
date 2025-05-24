@@ -1,27 +1,29 @@
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
+import { useForm, Resolver } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ErrorHandler } from "../../../utils/errorHandler";
 
 const schema = yup.object({
-  availabilityMode: yup.string().required("Please select an availability mode"),
-  preferredOpportunities: yup.string().required("Please enter your preferred opportunities"),
-  tutoringModes: yup.array().of(yup.string()).min(1, "Please select at least one tutoring mode"),
-  subjects: yup.string().required("Please enter subjects you can teach")
+  availableMode: yup.array().of(yup.string()).min(1, "Please select at least one availability mode"),
+  preferredOpportunities: yup.array().of(yup.string()).min(1, "Please select at least one preferred opportunity"),
+  subjectsOfExpertise: yup.array().of(yup.string()).min(1, "Please select at least one subject you can teach")
 }).required();
 
 interface FormData {
-  availabilityMode: string;
-  preferredOpportunities: string;
-  tutoringModes: string[];
-  subjects: string;
+  availableMode: string[];
+  preferredOpportunities: string[];
+  subjectsOfExpertise: string[];
 }
 
 interface StepServicePreferencesProps {
-  formData: Partial<FormData>;
-  updateFormData: (field: string, value: string | string[]) => void;
+  formData: {
+    availableMode: string[];
+    preferredOpportunities: string[];
+    subjectsOfExpertise: string[];
+    [key: string]: unknown;
+  };
+  updateFormData: (field: string, value: string[] | unknown) => void;
   onNext: () => void;
   onPrevious: () => void;
 }
@@ -33,32 +35,39 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
   onPrevious,
 }) => {
   const [error, setError] = useState<string | null>(null);
-    const { 
+  
+  // Create type-safe defaultValues
+  const defaultValues: FormData = {
+    availableMode: formData.availableMode || [],
+    preferredOpportunities: formData.preferredOpportunities || [],
+    subjectsOfExpertise: formData.subjectsOfExpertise || []
+  };
+  
+  const { 
     register, 
     handleSubmit, 
     formState: { errors } 
   } = useForm<FormData>({
-    resolver: yupResolver(schema),
-    defaultValues: formData as FormData,
+    resolver: yupResolver(schema) as unknown as Resolver<FormData>,
+    defaultValues
   });
 
-  const handleFormSubmit = handleSubmit(async (data: FormData) => {
+  const handleFormSubmit = handleSubmit((data: FormData) => {
     try {
       setError(null);
-      // Handle each form field type correctly
-      Object.entries(data).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          updateFormData(key, value as string[]);
-        } else {
-          updateFormData(key, value as string);
-        }
-      });
+      
+      // Update each field in parent component
+      updateFormData("availableMode", data.availableMode);
+      updateFormData("preferredOpportunities", data.preferredOpportunities);
+      updateFormData("subjectsOfExpertise", data.subjectsOfExpertise);
+      
       onNext();
     } catch (err) {
       const message = ErrorHandler.getUserFriendlyMessage(err);
       setError(message);
     }
   });
+  
   return (
     <form onSubmit={handleFormSubmit} className="space-y-4">
       {error && (
@@ -66,64 +75,51 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
           <span className="block sm:inline">{error}</span>
         </div>
       )}
-
+      
       <div>
-        <label className="block text-sm font-medium mb-2">Availability Mode</label>
-        <div className="flex space-x-4">
-          <label className="flex items-center">
+        <label className="block text-sm font-medium mb-2">Available Mode</label>
+        <div className="grid grid-cols-3 gap-3">
+          <label className="flex items-center space-x-2 bg-gray-100 p-3 rounded">
             <input
-              type="radio"
+              type="checkbox"
               value="online"
-              {...register("availabilityMode")}
-              className="mr-2"
+              {...register("availableMode")}
+              className="h-4 w-4"
             />
-            Online
+            <span>Online</span>
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center space-x-2 bg-gray-100 p-3 rounded">
             <input
-              type="radio"
+              type="checkbox"
               value="physical"
-              {...register("availabilityMode")}
-              className="mr-2"
+              {...register("availableMode")}
+              className="h-4 w-4"
             />
-            Physical
+            <span>Physical</span>
           </label>
-          <label className="flex items-center">
+          <label className="flex items-center space-x-2 bg-gray-100 p-3 rounded">
             <input
-              type="radio"
+              type="checkbox"
               value="both"
-              {...register("availabilityMode")}
-              className="mr-2"
+              {...register("availableMode")}
+              className="h-4 w-4"
             />
-            Both
+            <span>Both Options</span>
           </label>
         </div>
-        {errors.availabilityMode && (
-          <p className="text-red-500 text-sm mt-1">{errors.availabilityMode.message}</p>
+        {errors.availableMode && (
+          <p className="text-red-500 text-sm mt-1">{errors.availableMode.message}</p>
         )}
       </div>
-
+      
       <div>
-        <label className="block text-sm font-medium">Preferred Opportunities</label>
-        <input
-          type="text"
-          {...register("preferredOpportunities")}
-          className="mt-1 block w-full border rounded px-3 py-2"
-          placeholder="Enter your preferred opportunities"
-        />
-        {errors.preferredOpportunities && (
-          <p className="text-red-500 text-sm mt-1">{errors.preferredOpportunities.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Tutoring Modes</label>
+        <label className="block text-sm font-medium mb-2">Preferred Opportunities</label>
         <div className="grid grid-cols-3 gap-3">
           <label className="flex items-center space-x-2 bg-gray-100 p-3 rounded">
             <input
               type="checkbox"
               value="homeTutoring"
-              {...register("tutoringModes")}
+              {...register("preferredOpportunities")}
               className="h-4 w-4"
             />
             <span>Home Tutoring</span>
@@ -132,7 +128,7 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
             <input
               type="checkbox"
               value="homeSchooling"
-              {...register("tutoringModes")}
+              {...register("preferredOpportunities")}
               className="h-4 w-4"
             />
             <span>Home Schooling</span>
@@ -141,27 +137,38 @@ const StepServicePreferences: React.FC<StepServicePreferencesProps> = ({
             <input
               type="checkbox"
               value="schoolTutors"
-              {...register("tutoringModes")}
+              {...register("preferredOpportunities")}
               className="h-4 w-4"
             />
             <span>School Tutors</span>
           </label>
         </div>
-        {errors.tutoringModes && (
-          <p className="text-red-500 text-sm mt-1">{errors.tutoringModes.message}</p>
+        {errors.preferredOpportunities && (
+          <p className="text-red-500 text-sm mt-1">{errors.preferredOpportunities.message}</p>
         )}
       </div>
-
+      
       <div>
-        <label className="block text-sm font-medium">Subjects</label>
-        <input
-          type="text"
-          {...register("subjects")}
-          className="mt-1 block w-full border rounded px-3 py-2"
-          placeholder="Enter subjects you can teach (comma-separated)"
-        />
-        {errors.subjects && (
-          <p className="text-red-500 text-sm mt-1">{errors.subjects.message}</p>
+        <label className="block text-sm font-medium">Subjects of Expertise</label>
+        <div className="mt-1">
+          <p className="text-sm text-gray-500 mb-2">Select subjects you're proficient in teaching</p>
+          <div className="grid grid-cols-3 gap-2">
+            {['Mathematics', 'English', 'Science', 'Social Studies', 'Physics', 'Chemistry', 
+              'Biology', 'Literature', 'History', 'Geography', 'Economics', 'Computer Science'].map(subject => (
+              <label key={subject} className="flex items-center space-x-2 bg-gray-50 p-2 rounded border">
+                <input
+                  type="checkbox"
+                  value={subject}
+                  {...register("subjectsOfExpertise")}
+                  className="h-4 w-4"
+                />
+                <span className="text-sm">{subject}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+        {errors.subjectsOfExpertise && (
+          <p className="text-red-500 text-sm mt-1">{errors.subjectsOfExpertise.message}</p>
         )}
       </div>
 

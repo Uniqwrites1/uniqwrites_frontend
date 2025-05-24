@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import StepParentInfo from './StepParentInfo';
 import StepStudentInfo from './StepStudentInfo';
 import StepTutoringRequirements from './StepTutoringRequirements';
 import StepTutorPreference from './StepTutorPreference';
+import { emailService } from '../../../services/emailService';
 
 const steps = [
   { id: 1, title: 'Parent Info' },
@@ -98,10 +100,10 @@ export default function ParentFormWrapper() {
     // Tutor Preferences
     preferredGender: '',
     languagePreference: '',
-    qualificationsPriority: ''
-  });
-
-  const updateFormData = (field: keyof FormData, value: any) => {
+    qualificationsPriority: ''  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const updateFormData = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -115,38 +117,63 @@ export default function ParentFormWrapper() {
     if (currentStep > 1) {
       setCurrentStep(prev => prev - 1);
     }
-  };    const handleSubmit = () => {
-    // Store form data and navigate to signup
-    navigate('/signup/parent', { 
-      state: {
-        prefilledData: {
-          emailAddress: formData.emailAddress,
-          fullName: formData.fullName,
-          phoneNumber: formData.phoneNumber,
-          // Include other relevant form data
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    
+    try {
+      // Send form submission via email service
+      const emailSuccess = await emailService.sendFormSubmission({
+        formType: 'parent',
+        submitterName: formData.fullName,
+        submitterEmail: formData.emailAddress,
+        formData: {
+          parentInfo: {
+            fullName: formData.fullName,
+            phoneNumber: formData.phoneNumber,
+            emailAddress: formData.emailAddress,
+            residentialAddress: formData.residentialAddress,
+            stateOfResidence: formData.stateOfResidence,
+            relationshipToStudent: formData.relationshipToStudent
+          },
           students: formData.students,
-          serviceRequirements: {
+          tutoringRequirements: {
             servicesType: formData.servicesType,
             subjectsRequested: formData.subjectsRequested,
             preferredMode: formData.preferredMode,
-            schedule: {
-              preferredDays: formData.preferredDays,
-              durationPerLesson: formData.durationPerLesson,
-              preferredLessonTime: formData.preferredLessonTime,
-              startDate: formData.startDate
-            }
+            preferredDays: formData.preferredDays,
+            durationPerLesson: formData.durationPerLesson,
+            preferredLessonTime: formData.preferredLessonTime,
+            startDate: formData.startDate
           },
           tutorPreferences: {
             preferredGender: formData.preferredGender,
             languagePreference: formData.languagePreference,
             qualificationsPriority: formData.qualificationsPriority
           }
-        },
-        source: 'parent-tutoring-request'
-      }
-    });
-  };
+        }
+      });
 
+      if (emailSuccess) {
+        toast.success('Your tutoring request has been submitted successfully!');
+        // Redirect to thank you page with form type
+        navigate('/thank-you', { 
+          state: { 
+            formType: 'parent',
+            submitterName: formData.fullName
+          } 
+        });
+      } else {
+        throw new Error('Failed to send email');
+      }
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('Failed to submit form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-[#F8F8F8] py-12 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
@@ -154,6 +181,16 @@ export default function ParentFormWrapper() {
           <h1 className="text-3xl font-bold">Parent Tutoring Request</h1>
           <p className="mt-2 text-white opacity-90">Get matched with the perfect tutor for your child</p>
         </div>
+        
+        {/* Loading Overlay */}
+        {isSubmitting && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFC107] mx-auto mb-4"></div>
+              <p className="text-gray-700">Submitting your request...</p>
+            </div>
+          </div>
+        )}
         
         {/* Progress Bar */}
         <div className="mb-8">

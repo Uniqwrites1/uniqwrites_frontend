@@ -35,18 +35,44 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path,
+        ws: true,
+        xfwd: true,
+        rewrite: (path) => {
+          // Remove the /api prefix before sending to backend
+          // The backend expects paths without the /api prefix
+          const rewrittenPath = path.replace(/^\/api/, '');
+          console.log(`[Proxy Rewrite] ${path} => ${rewrittenPath}`);
+          return rewrittenPath;
+        },
         configure: (proxy) => {
           proxy.on('error', (err) => {
             console.error('Proxy error:', err);
           });
-          proxy.on('proxyReq', (_proxyReq, req) => {
+          proxy.on('proxyReq', (proxyReq, req) => {
+            // Set appropriate headers for the outgoing request
+            proxyReq.setHeader('Content-Type', 'application/json');
+            proxyReq.setHeader('Accept', 'application/json');
             // Log outgoing requests to backend
-            console.log(`[Proxy] ${req.method} ${req.url}`);
+            console.log(`[Proxy Req] ${req.method} ${req.url}`);
           });
           proxy.on('proxyRes', (proxyRes, req) => {
             // Log responses from backend
-            console.log(`[Proxy] ${req.method} ${req.url} => ${proxyRes.statusCode}`);
+            console.log(`[Proxy Res] ${req.method} ${req.url} => ${proxyRes.statusCode}`);
+            let responseBody = '';
+            proxyRes.on('data', (chunk) => {
+              responseBody += chunk;
+            });
+            proxyRes.on('end', () => {
+              if (responseBody) {
+                try {
+                  const bodyStr = responseBody.toString().substring(0, 300); // Truncate for log
+                  console.log(`[Proxy Response Body] ${bodyStr}${responseBody.length > 300 ? '...' : ''}`);
+                } catch (error: unknown) {
+                  const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+                  console.log('[Proxy] Could not parse response body:', errorMessage);
+                }
+              }
+            });
           });
         }
       }

@@ -1,6 +1,8 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { emailService } from '../../../services/emailService';
 
 interface SponsorFormData {
   fullName: string;
@@ -28,22 +30,46 @@ const SponsorForm: React.FC = () => {
       initiative: isLiteracy ? 'Literacy Immersion' : 'Back to School'
     }
   });
-
   const onSubmit = async (data: SponsorFormData) => {
     try {
-      // TODO: Implement API call
-      const response = await fetch('/api/initiatives/sponsor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+      // Send form submission via email service
+      const emailSuccess = await emailService.sendFormSubmission({
+        formType: 'initiative',
+        submitterName: data.fullName,
+        submitterEmail: data.email,
+        formData: {
+          type: 'sponsor',
+          initiative: data.initiative,
+          contactInfo: {
+            fullName: data.fullName,
+            email: data.email,
+            phoneNumber: data.phoneNumber,
+            organization: data.organization,
+            preferredContact: data.preferredContact
+          },
+          sponsorshipDetails: {
+            sponsorshipType: data.sponsorshipType,
+            amount: data.amount,
+            message: data.message
+          }
+        }
       });
 
-      if (!response.ok) throw new Error('Submission failed');
-      
-      // Redirect to success page or show success message
-      navigate('/initiatives/thank-you');
+      if (emailSuccess) {
+        toast.success('Your sponsorship interest has been submitted successfully!');
+        // Redirect to thank you page with form type
+        navigate('/thank-you', { 
+          state: { 
+            formType: 'initiative',
+            submitterName: data.fullName
+          } 
+        });
+      } else {
+        throw new Error('Failed to send email');
+      }
     } catch (error) {
       console.error('Form submission error:', error);
+      toast.error('Failed to submit form. Please try again.');
     }
   };
 

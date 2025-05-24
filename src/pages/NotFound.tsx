@@ -1,31 +1,11 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../hooks/useAuth';
 
 const NotFound: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const handleGoBack = () => {
     navigate(-1);
-  };
-
-  // Determine the appropriate home page based on user role
-  const getHomePage = () => {
-    if (!user) return '/';
-
-    switch (user.role) {
-      case 'teacher':
-        return '/teacher/dashboard';
-      case 'parent':
-        return '/parent/dashboard';
-      case 'school':
-        return '/school/dashboard';
-      case 'admin':
-        return '/admin/dashboard';
-      default:
-        return '/';
-    }
   };
 
   return (
@@ -42,9 +22,8 @@ const NotFound: React.FC = () => {
             className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
           >
             Go Back
-          </button>
-          <Link
-            to={getHomePage()}
+          </button>          <Link
+            to="/"
             className="px-6 py-2 bg-[#FFC107] text-black rounded-md hover:bg-[#FFD700] transition-colors"
           >
             Go to Homepage

@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import StepPersonalDetails from './StepPersonalDetails';
 import StepAcademicInfo from './StepAcademicInfo';
 import StepServicePreferences from './StepServicePreferences';
 import StepUploads from './StepUploads';
+import { emailService } from '../../../services/emailService';
 
 const steps = [
   { id: 1, title: 'Personal Details' },
@@ -38,11 +40,15 @@ interface FormData {
   cv: File | null;
   photo: File | null;
   certificates: File[];
+  
+  // Index signature to allow additional properties
+  [key: string]: unknown;
 }
 
 export default function TeacherFormWrapper() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     // Personal Details
     fullName: '',
@@ -68,8 +74,7 @@ export default function TeacherFormWrapper() {
     cv: null,
     photo: null,
     certificates: []
-  });
-  const updateFormData = (field: keyof FormData, value: FormData[keyof FormData]) => {
+  });  const updateFormData = (field: string, value: unknown) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -85,17 +90,21 @@ export default function TeacherFormWrapper() {
     }
   };  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Store form data and navigate to signup
-    navigate('/signup/teacher', { 
-      state: {
-        prefilledData: {
-          email: formData.email,
-          fullName: formData.fullName,
-          phoneNumber: formData.phoneNumber,
-          // Include other relevant form data
+    setIsSubmitting(true);
+    
+    try {
+      // Send form submission via email service
+      const emailSuccess = await emailService.sendFormSubmission({
+        formType: 'teacher',
+        submitterName: formData.fullName,
+        submitterEmail: formData.email,
+        formData: {
           personalDetails: {
+            fullName: formData.fullName,
             gender: formData.gender,
             dateOfBirth: formData.dateOfBirth,
+            phoneNumber: formData.phoneNumber,
+            email: formData.email,
             address: formData.address,
             state: formData.state
           },
@@ -110,22 +119,49 @@ export default function TeacherFormWrapper() {
             availableMode: formData.availableMode,
             preferredOpportunities: formData.preferredOpportunities
           },
-          uploadedDocuments: {
-            cv: formData.cv,
-            photo: formData.photo,
-            certificates: formData.certificates
+          uploads: {
+            cv: formData.cv?.name || 'No CV uploaded',
+            photo: formData.photo?.name || 'No photo uploaded',
+            certificates: formData.certificates.map(cert => cert.name).join(', ') || 'No certificates uploaded'
           }
-        },
-        source: 'teacher-registration'
+        }
+      });
+
+      if (emailSuccess) {
+        toast.success('Your teacher application has been submitted successfully!');
+        // Redirect to thank you page with form type
+        navigate('/thank-you', { 
+          state: { 
+            formType: 'teacher',
+            submitterName: formData.fullName
+          } 
+        });
+      } else {
+        throw new Error('Failed to send email');
       }
-    });
-  };return (
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast.error('Failed to submit form. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };  return (
     <div className="min-h-screen bg-[#F8F8F8] py-12 px-4 sm:px-6">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
         <div className="bg-black text-[#FFC107] text-center py-6 rounded-t-xl">
           <h1 className="text-3xl font-bold">Teacher Registration</h1>
           <p className="mt-2 text-white opacity-90">Join our community of educators</p>
         </div>
+        
+        {/* Loading Overlay */}
+        {isSubmitting && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFC107] mx-auto mb-4"></div>
+              <p className="text-gray-700">Submitting your application...</p>
+            </div>
+          </div>
+        )}
         
         {/* Progress Bar */}
         <div className="mb-8">
@@ -198,11 +234,8 @@ export default function TeacherFormWrapper() {
                 onNext={handleNext}
                 onPrevious={handlePrevious}
               />
-            )}
-            {currentStep === 4 && (
+            )}            {currentStep === 4 && (
               <StepUploads
-                formData={formData}
-                updateFormData={updateFormData}
                 onSubmit={handleSubmit}
                 onPrevious={handlePrevious}
               />
