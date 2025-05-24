@@ -3,15 +3,5 @@
     "pages/api/send-email.ts": {
       "runtime": "@vercel/node"
     }
-  },
-  "env": {
-    "GMAIL_USER": "@gmail_user",
-    "GMAIL_APP_PASSWORD": "@gmail_app_password"
-  },
-  "build": {
-    "env": {
-      "GMAIL_USER": "@gmail_user",
-      "GMAIL_APP_PASSWORD": "@gmail_app_password"
-    }
   }
 }
