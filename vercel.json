@@ -1,0 +1,14 @@
+{
+  "functions": {
+    "pages/api/**/*.ts": {
+      "runtime": "@vercel/node"
+    },
+    "api/**/*.ts": {
+      "runtime": "@vercel/node"
+    }
+  },
+  "env": {
+    "GMAIL_USER": "@gmail_user",
+    "GMAIL_APP_PASSWORD": "@gmail_app_password"
+  }
+}

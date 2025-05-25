@@ -41,40 +41,44 @@ class EmailService {  // Send form submission to admin email
       console.error('❌ Failed to send form submission email:', error);
       return false;
     }
-  }
-  // Send via Vercel serverless function (recommended)
+  }  // Send via Vercel serverless function (recommended)
   private async sendViaVercelFunction(submission: FormSubmissionEmail): Promise<boolean> {
-    try {
-      console.log('📧 Vercel Function - Sending to /api/send-email...');
-      const response = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          type: this.getSubjectByFormType(submission.formType),
-          name: submission.submitterName,
-          email: submission.submitterEmail,
-          phone: this.extractPhoneFromFormData(submission.formData),
-          interest: this.extractInterestFromFormData(submission.formData, submission.formType),
-          sponsorType: this.extractSponsorTypeFromFormData(submission.formData),
-          message: this.generatePlainTextContent(submission)
-        })
-      });
+    const endpoints = ['/api/send-email', '/pages/api/send-email'];
+    
+    for (const endpoint of endpoints) {
+      try {
+        console.log(`📧 Vercel Function - Trying endpoint: ${endpoint}...`);
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            type: this.getSubjectByFormType(submission.formType),
+            name: submission.submitterName,
+            email: submission.submitterEmail,
+            phone: this.extractPhoneFromFormData(submission.formData),
+            interest: this.extractInterestFromFormData(submission.formData, submission.formType),
+            sponsorType: this.extractSponsorTypeFromFormData(submission.formData),
+            message: this.generatePlainTextContent(submission)
+          })
+        });
 
-      if (!response.ok) {
+        if (response.ok) {
+          const result = await response.json().catch(() => null);
+          console.log(`✅ Email sent successfully via Vercel function (${endpoint}):`, result);
+          return true;
+        }
+
         const errorData = await response.text().catch(() => 'Unknown error');
-        console.error('❌ Vercel function returned error:', response.status, errorData);
-        return false;
+        console.error(`❌ Endpoint ${endpoint} returned error:`, response.status, errorData);
+      } catch (error) {
+        console.error(`❌ Endpoint ${endpoint} failed:`, error);
       }
-
-      const result = await response.json().catch(() => null);
-      console.log('✅ Email sent successfully via Vercel function:', result);
-      return true;
-    } catch (error) {
-      console.error('❌ Vercel function submission failed:', error);
-      return false;
     }
+    
+    console.error('❌ All Vercel function endpoints failed');
+    return false;
   }
   // Send via Formspree (free service fallback)
   private async sendViaFormspree(submission: FormSubmissionEmail): Promise<boolean> {
