@@ -1,5 +1,7 @@
 // Email service for the public site
 
+import { emailValidationService } from './emailValidationService';
+
 const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT;
 
 export interface EmailData {
@@ -25,6 +27,20 @@ class EmailService {  // Send form submission to admin email
       const success = await this.sendViaVercelFunction(submission);
       if (success) {
         console.log('✅ Email sent successfully via Vercel function');
+        
+        // Register email to prevent duplicates
+        try {
+          await emailValidationService.registerEmail(
+            submission.submitterEmail,
+            submission.formType,
+            submission.submitterName
+          );
+          console.log('✅ Email registered for duplicate prevention');
+        } catch (error) {
+          console.error('⚠️ Failed to register email for duplicate prevention:', error);
+          // Don't fail the whole process if registration fails
+        }
+        
         return true;
       }
 
@@ -32,6 +48,20 @@ class EmailService {  // Send form submission to admin email
       const fallbackSuccess = await this.sendViaFormspree(submission);
       if (fallbackSuccess) {
         console.log('✅ Email sent successfully via Formspree fallback');
+        
+        // Register email to prevent duplicates
+        try {
+          await emailValidationService.registerEmail(
+            submission.submitterEmail,
+            submission.formType,
+            submission.submitterName
+          );
+          console.log('✅ Email registered for duplicate prevention');
+        } catch (error) {
+          console.error('⚠️ Failed to register email for duplicate prevention:', error);
+          // Don't fail the whole process if registration fails
+        }
+        
         return true;
       }
 
@@ -60,7 +90,10 @@ class EmailService {  // Send form submission to admin email
             phone: this.extractPhoneFromFormData(submission.formData),
             interest: this.extractInterestFromFormData(submission.formData, submission.formType),
             sponsorType: this.extractSponsorTypeFromFormData(submission.formData),
-            message: this.generatePlainTextContent(submission)
+            message: this.generatePlainTextContent(submission),
+            // Send structured form data for better email formatting
+            formType: submission.formType,
+            structuredData: this.formatStructuredData(submission.formData, submission.formType)
           })
         });
 
@@ -155,7 +188,6 @@ class EmailService {  // Send form submission to admin email
     };
     return subjects[formType as keyof typeof subjects] || 'New Form Submission';
   }
-
   private generatePlainTextContent(submission: FormSubmissionEmail): string {
     const { formType, submitterName, submitterEmail, formData } = submission;
 
@@ -173,6 +205,35 @@ class EmailService {  // Send form submission to admin email
     }
 
     return content;
+  }
+
+  private formatStructuredData(formData: Record<string, unknown>, formType: string): Record<string, unknown> {
+    switch (formType) {
+      case 'teacher':
+        return this.formatTeacherData(formData);
+      case 'parent':
+        return this.formatParentData(formData);
+      case 'school':
+        return this.formatSchoolData(formData);
+      case 'initiative':
+        return this.formatInitiativeData(formData);
+      default:
+        return { rawData: formData };
+    }
+  }  private formatTeacherData(formData: Record<string, unknown>): Record<string, unknown> {
+    return formData; // Return as-is for now, will be handled by enhanced email template
+  }
+
+  private formatParentData(formData: Record<string, unknown>): Record<string, unknown> {
+    return formData; // Return as-is for now, will be handled by enhanced email template
+  }
+
+  private formatSchoolData(formData: Record<string, unknown>): Record<string, unknown> {
+    return formData; // Return as-is for now, will be handled by enhanced email template
+  }
+
+  private formatInitiativeData(formData: Record<string, unknown>): Record<string, unknown> {
+    return formData; // Return as-is for now, will be handled by enhanced email template
   }
 }
 

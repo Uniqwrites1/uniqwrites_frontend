@@ -41,18 +41,16 @@ const HeroBanner = () => {
     <section
       className="flex flex-col md:flex-row items-center gap-6 py-16 px-6 bg-cover bg-center rounded"
       style={{ backgroundImage: `url(${heroVisual})`, minHeight: "400px" }}
-    >
-      <div className="md:w-1/2 bg-white bg-opacity-80 p-6 rounded">
-        <h1 className="text-4xl font-extrabold mb-4">
+    >      <div className="md:w-1/2 bg-white bg-opacity-90 p-8 rounded-lg shadow-xl border-l-4 border-primary">
+        <h1 className="text-5xl font-black mb-6 text-secondary leading-tight drop-shadow-sm">
           Empowering Learning,<br />
           Connecting Educators,<br />
-          Transforming Futures!
+          <span className="text-primary">Transforming Futures!</span>
         </h1>
-        <p className="text-gray-600 mb-6">...Education with you in mind…</p>
-        <div className="flex gap-4 relative" ref={dropdownRef}>
+        <p className="text-xl text-gray-700 mb-8 font-semibold">...Education with you in mind…</p>        <div className="flex gap-4 relative" ref={dropdownRef}>
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="bg-yellow-400 text-black font-bold px-6 py-2 rounded hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            className="bg-primary text-secondary font-black px-8 py-3 rounded-lg hover:bg-primary-light transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-primary-light shadow-lg text-lg"
             aria-haspopup="true"
             aria-expanded={isOpen}
             onKeyDown={handleKeyDown}
@@ -86,9 +84,8 @@ const HeroBanner = () => {
                 School admins
               </button>
             </div>
-          )}
-          <button
-            className="bg-yellow-400 text-black font-bold px-6 py-2 rounded hover:bg-yellow-500"
+          )}          <button
+            className="bg-secondary text-primary font-black px-8 py-3 rounded-lg hover:bg-gray-800 transform hover:scale-105 transition-all duration-300 shadow-lg text-lg border-2 border-primary"
             onClick={() => navigate("/services")}
           >
             Explore Services

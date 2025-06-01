@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { emailService } from '../../../services/emailService';
+import { EmailInput } from '../../common/EmailInput';
 
 interface SponsorFormData {
   fullName: string;
@@ -20,17 +21,31 @@ const SponsorForm: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isLiteracy = location.pathname.includes('literacy');
+  const [emailValidationState, setEmailValidationState] = useState({ isValid: true, isDuplicate: false });
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
+    setValue,
+    watch
   } = useForm<SponsorFormData>({
     defaultValues: {
       initiative: isLiteracy ? 'Literacy Immersion' : 'Back to School'
     }
   });
-  const onSubmit = async (data: SponsorFormData) => {
+
+  const watchedEmail = watch("email");
+
+  const handleEmailValidation = (isValid: boolean, isDuplicate: boolean) => {
+    setEmailValidationState({ isValid, isDuplicate });
+  };  const onSubmit = async (data: SponsorFormData) => {
+    // Check email validation before proceeding
+    if (!emailValidationState.isValid || emailValidationState.isDuplicate) {
+      toast.error('Please fix email validation issues before submitting.');
+      return;
+    }
+
     try {
       // Send form submission via email service
       const emailSuccess = await emailService.sendFormSubmission({
@@ -91,24 +106,18 @@ const SponsorForm: React.FC = () => {
             {errors.fullName && (
               <p className="mt-1 text-sm text-red-600">{errors.fullName.message}</p>
             )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
-            <input
-              type="email"
-              {...register('email', { 
-                required: 'Email is required',
-                pattern: {
-                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                  message: 'Invalid email address'
-                }
-              })}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
+          </div>          <div>
+            <EmailInput
+              value={watchedEmail || ""}
+              onChange={(value) => setValue("email", value)}
+              onValidationChange={handleEmailValidation}
+              formType="initiative"
+              id="email"
+              name="email"
+              required
+              error={errors.email?.message}
+              label="Email Address"
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-            )}
           </div>
 
           <div>
@@ -198,13 +207,15 @@ const SponsorForm: React.FC = () => {
               rows={4}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500"
             />
-          </div>
-
-          <div>
+          </div>          <div>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-black bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || !emailValidationState.isValid || emailValidationState.isDuplicate}
+              className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                isSubmitting || !emailValidationState.isValid || emailValidationState.isDuplicate
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'text-black bg-yellow-400 hover:bg-yellow-500 focus:ring-yellow-500'
+              }`}
             >
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { EmailInput } from "../../common/EmailInput";
 
 const schema = yup.object().shape({
   fullName: yup.string().required("Full name is required"),
@@ -41,18 +42,33 @@ const StepPersonalDetails: React.FC<StepPersonalDetailsProps> = ({
   updateFormData,
   onNext,
 }) => {
-  const { register, handleSubmit, formState: { errors } } = useForm({
+  const [emailValidationState, setEmailValidationState] = useState({ isValid: true, isDuplicate: false });
+  
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm({
     resolver: yupResolver(schema),
     defaultValues: formData,
   });
-  return (
+
+  const watchedEmail = watch("email");
+
+  const handleEmailValidation = (isValid: boolean, isDuplicate: boolean) => {
+    setEmailValidationState({ isValid, isDuplicate });
+  };
+
+  const handleFormSubmit = (data: any) => {
+    // Check email validation before proceeding
+    if (!emailValidationState.isValid || emailValidationState.isDuplicate) {
+      console.log('❌ Cannot proceed: Email validation failed');
+      return;
+    }
+
+    Object.entries(data).forEach(([key, value]) => {
+      updateFormData(key, value);
+    });
+    onNext();
+  };  return (
     <motion.form
-      onSubmit={handleSubmit((data) => {
-        Object.entries(data).forEach(([key, value]) => {
-          updateFormData(key, value);
-        });
-        onNext();
-      })}
+      onSubmit={handleSubmit(handleFormSubmit)}
       className="space-y-6"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -122,22 +138,20 @@ const StepPersonalDetails: React.FC<StepPersonalDetailsProps> = ({
           {errors.phoneNumber && (
             <p className="mt-1 text-sm text-red-600">{errors.phoneNumber.message}</p>
           )}
-        </div>
-
-        <div>
-          <label className="block text-sm font-semibold text-black mb-2" htmlFor="email">
-            Email Address
-          </label>
-          <input
-            type="email"
+        </div>        <div>
+          <EmailInput
+            value={watchedEmail || ""}
+            onChange={(value) => {
+              setValue("email", value);
+              updateFormData("email", value);
+            }}
+            onValidationChange={handleEmailValidation}
+            formType="teacher"
             id="email"
-            {...register("email")}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#FFC107] focus:border-transparent transition-all duration-200"
-            placeholder="Enter your email address"
+            name="email"
+            required
+            error={errors.email?.message}
           />
-          {errors.email && (
-            <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
-          )}
         </div>
 
         <div>
@@ -207,12 +221,15 @@ const StepPersonalDetails: React.FC<StepPersonalDetailsProps> = ({
         {errors.address && (
           <p className="mt-1 text-sm text-red-600">{errors.address.message}</p>
         )}
-      </div>
-
-      <div className="flex justify-end pt-4">
+      </div>      <div className="flex justify-end pt-4">
         <button
           type="submit"
-          className="px-6 py-2 bg-[#FFC107] text-black rounded-md hover:bg-[#FFD700] focus:outline-none focus:ring-2 focus:ring-[#FFC107] focus:ring-offset-2 transition-all duration-200 font-semibold"
+          disabled={!emailValidationState.isValid || emailValidationState.isDuplicate}
+          className={`px-6 py-2 rounded-md font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+            !emailValidationState.isValid || emailValidationState.isDuplicate
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-[#FFC107] text-black hover:bg-[#FFD700] focus:ring-[#FFC107]'
+          }`}
         >
           Next Step
         </button>

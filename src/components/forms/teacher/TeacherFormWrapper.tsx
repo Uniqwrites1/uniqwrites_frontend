@@ -146,9 +146,9 @@ export default function TeacherFormWrapper() {
       setIsSubmitting(false);
     }
   };  return (
-    <div className="min-h-screen bg-[#F8F8F8] py-12 px-4 sm:px-6">
-      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
-        <div className="bg-black text-[#FFC107] text-center py-6 rounded-t-xl">
+    <div className="min-h-screen bg-[#F8F8F8] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-black text-[#FFC107] text-center py-8 px-6">
           <h1 className="text-3xl font-bold">Teacher Registration</h1>
           <p className="mt-2 text-white opacity-90">Join our community of educators</p>
         </div>
@@ -156,15 +156,14 @@ export default function TeacherFormWrapper() {
         {/* Loading Overlay */}
         {isSubmitting && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-sm mx-4">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#FFC107] mx-auto mb-4"></div>
-              <p className="text-gray-700">Submitting your application...</p>
+              <p className="text-gray-700 font-medium">Submitting your application...</p>
             </div>
           </div>
         )}
-        
-        {/* Progress Bar */}
-        <div className="mb-8">
+          {/* Progress Bar */}
+        <div className="px-8 py-6 bg-gray-50 border-b">
           <div className="flex justify-between relative">
             {/* Progress line */}
             <div className="absolute top-4 left-0 h-0.5 bg-gray-200 w-full -z-10"></div>
@@ -204,44 +203,46 @@ export default function TeacherFormWrapper() {
         </div>
 
         {/* Form Steps */}
-        <AnimatePresence mode='wait'>
-          <motion.div
-            key={currentStep}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.2 }}
-          >
-            {currentStep === 1 && (
-              <StepPersonalDetails
-                formData={formData}
-                updateFormData={updateFormData}
-                onNext={handleNext}
-              />
-            )}
-            {currentStep === 2 && (
-              <StepAcademicInfo
-                formData={formData}
-                updateFormData={updateFormData}
-                onNext={handleNext}
-                onPrevious={handlePrevious}
-              />
-            )}
-            {currentStep === 3 && (
-              <StepServicePreferences
-                formData={formData}
-                updateFormData={updateFormData}
-                onNext={handleNext}
-                onPrevious={handlePrevious}
-              />
-            )}            {currentStep === 4 && (
-              <StepUploads
-                onSubmit={handleSubmit}
-                onPrevious={handlePrevious}
-              />
-            )}
-          </motion.div>
-        </AnimatePresence>
+        <div className="px-8 py-8">
+          <AnimatePresence mode='wait'>
+            <motion.div
+              key={currentStep}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {currentStep === 1 && (
+                <StepPersonalDetails
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  onNext={handleNext}
+                />
+              )}
+              {currentStep === 2 && (
+                <StepAcademicInfo
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  onNext={handleNext}
+                  onPrevious={handlePrevious}
+                />
+              )}
+              {currentStep === 3 && (
+                <StepServicePreferences
+                  formData={formData}
+                  updateFormData={updateFormData}
+                  onNext={handleNext}
+                  onPrevious={handlePrevious}
+                />
+              )}            {currentStep === 4 && (
+                <StepUploads
+                  onSubmit={handleSubmit}
+                  onPrevious={handlePrevious}
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
     </div>
   );

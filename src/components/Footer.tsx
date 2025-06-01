@@ -9,12 +9,17 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <img
-              src={logoImage} // Using the imported logo image
-              alt="Uniqwrites"
-              className="h-12 mb-4"
-            />
-            <p className="text-sm">
+            <div className="flex items-center mb-4">
+              <img
+                src={logoImage} // Using the imported logo image
+                alt="Uniqwrites Educational Concepts"
+                className="h-16 w-auto drop-shadow-lg hover:drop-shadow-xl transition-all duration-300"
+              />
+              <span className="ml-3 text-2xl font-black text-primary tracking-wide drop-shadow-sm">
+                Uniqwrites
+              </span>
+            </div>
+            <p className="text-sm font-medium">
               Empowering education through innovative solutions and expert
               guidance.
             </p>

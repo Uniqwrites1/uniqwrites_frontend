@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { emailService } from '../../../services/emailService';
+import { EmailInput } from '../../common/EmailInput';
 
 interface SchoolServiceRequestData {
   schoolName: string;
@@ -31,11 +32,23 @@ interface SchoolServiceRequestData {
 }
 
 const SchoolServiceRequestForm: React.FC = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm<SchoolServiceRequestData>();
+  const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<SchoolServiceRequestData>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [emailValidationState, setEmailValidationState] = useState({ isValid: true, isDuplicate: false });
   const navigate = useNavigate();
-  const onSubmit = async (data: SchoolServiceRequestData) => {
+
+  const watchedSchoolEmail = watch("schoolEmail");
+
+  const handleEmailValidation = (isValid: boolean, isDuplicate: boolean) => {
+    setEmailValidationState({ isValid, isDuplicate });
+  };  const onSubmit = async (data: SchoolServiceRequestData) => {
+    // Check email validation before proceeding
+    if (!emailValidationState.isValid || emailValidationState.isDuplicate) {
+      toast.error('Please fix email validation issues before submitting.');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     
@@ -202,18 +215,19 @@ const SchoolServiceRequestForm: React.FC = () => {
                 />
                 {errors.lga && <p className="text-red-500">{errors.lga.message}</p>}
               </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-4">
+            </div>            <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <label className="block mb-2">School Email</label>
-                <input
-                  type="email"
-                  {...register('schoolEmail', { required: 'School Email is required' })}
-                  className="w-full p-2 border rounded"
-                  placeholder="Enter school email"
+                <EmailInput
+                  value={watchedSchoolEmail || ""}
+                  onChange={(value) => setValue("schoolEmail", value)}
+                  onValidationChange={handleEmailValidation}
+                  formType="school"
+                  id="schoolEmail"
+                  name="schoolEmail"
+                  required
+                  error={errors.schoolEmail?.message}
+                  label="School Email"
                 />
-                {errors.schoolEmail && <p className="text-red-500">{errors.schoolEmail.message}</p>}
               </div>
 
               <div>
@@ -484,14 +498,16 @@ const SchoolServiceRequestForm: React.FC = () => {
               </span>
             </label>
             {errors.agreementConfirmed && <p className="text-red-500">{errors.agreementConfirmed.message}</p>}
-          </div>
-
-          {/* Submit Button */}
+          </div>          {/* Submit Button */}
           <div className="text-center">
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="bg-black text-yellow-400 px-8 py-3 rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50"
+              disabled={isSubmitting || !emailValidationState.isValid || emailValidationState.isDuplicate}
+              className={`px-8 py-3 rounded-lg transition-colors ${
+                isSubmitting || !emailValidationState.isValid || emailValidationState.isDuplicate
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-black text-yellow-400 hover:bg-gray-800'
+              }`}
             >
               {isSubmitting ? 'Submitting...' : 'Submit Request'}
             </button>

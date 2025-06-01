@@ -9,15 +9,16 @@ const Navbar = () => {
   return (
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center h-16 justify-between">
-          {/* Logo */}
-          <div className="flex-shrink-0 flex items-center">
-            <Link to="/">
+        <div className="flex items-center h-16 justify-between">          {/* Logo */}          <div className="flex-shrink-0 flex items-center">
+            <Link to="/" className="flex items-center group">
               <img
-                className="h-12 w-auto"
+                className="h-16 w-auto drop-shadow-lg hover:drop-shadow-xl transition-all duration-300 group-hover:scale-105"
                 src={logoImage}
-                alt="Uniqwrites"
+                alt="Uniqwrites Educational Concepts"
               />
+              <span className="ml-3 text-3xl font-black text-secondary tracking-wide group-hover:text-primary transition-colors duration-300 drop-shadow-sm">
+                Uniqwrites
+              </span>
             </Link>
           </div>
 

@@ -1,26 +1,27 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { Phone, Mail, MapPin, MessageSquare } from "lucide-react";
 import { emailService } from "../services/emailService";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
+interface ContactFormData {
+  name: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
 const Contact = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const { register, handleSubmit, formState: { errors } } = useForm<ContactFormData>();
+
+  const onSubmit = async (data: ContactFormData) => {
     setLoading(true);
 
     try {
-      const formData = new FormData(e.target as HTMLFormElement);
-      const data = {
-        name: formData.get('name') as string,
-        email: formData.get('email') as string,
-        subject: formData.get('subject') as string,
-        message: formData.get('message') as string,
-      };
-
       const success = await emailService.sendFormSubmission({
         formType: 'initiative',
         submitterName: data.name,
@@ -105,7 +106,7 @@ const Contact = () => {
           {/* Contact Form */}
           <div>
             <form
-              onSubmit={handleSubmit}
+              onSubmit={handleSubmit(onSubmit)}
               className="bg-white p-8 rounded-lg shadow-lg border border-gray-200"
             >
               <h2 className="text-2xl font-bold mb-6">Send us a Message</h2>
@@ -121,10 +122,12 @@ const Contact = () => {
                   <input
                     type="text"
                     id="name"
-                    name="name"
+                    {...register('name', { required: 'Name is required' })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                    required
                   />
+                  {errors.name && (
+                    <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -137,10 +140,18 @@ const Contact = () => {
                   <input
                     type="email"
                     id="email"
-                    name="email"
+                    {...register('email', { 
+                      required: 'Email is required',
+                      pattern: {
+                        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                        message: 'Please enter a valid email address'
+                      }
+                    })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                    required
                   />
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -153,10 +164,12 @@ const Contact = () => {
                   <input
                     type="text"
                     id="subject"
-                    name="subject"
+                    {...register('subject', { required: 'Subject is required' })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                    required
                   />
+                  {errors.subject && (
+                    <p className="mt-1 text-sm text-red-600">{errors.subject.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -168,17 +181,23 @@ const Contact = () => {
                   </label>
                   <textarea
                     id="message"
-                    name="message"
+                    {...register('message', { required: 'Message is required' })}
                     rows={4}
                     className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary"
-                    required
-                  ></textarea>
+                  />
+                  {errors.message && (
+                    <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-primary text-secondary px-6 py-3 rounded-md font-medium hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full px-6 py-3 rounded-md font-medium transition-colors ${
+                    loading
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-primary text-secondary hover:bg-primary-dark'
+                  }`}
                 >
                   {loading ? 'Sending...' : 'Send Message'}
                 </button>
