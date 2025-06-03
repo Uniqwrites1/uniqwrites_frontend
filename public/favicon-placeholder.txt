@@ -1,0 +1,2 @@
+<!-- Simple favicon for Uniqwrites - This will be replaced with proper ICO format -->
+<!-- This is a placeholder. For production, convert your actual logo to ICO format -->
