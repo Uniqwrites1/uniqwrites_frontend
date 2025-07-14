@@ -25,7 +25,7 @@ import PurposeActionPoint from "./pages/PurposeActionPoint";
 import ApplyTutor from "./pages/apply-tutor";
 import ThankYou from "./pages/ThankYou";
 import NotFound from "./pages/NotFound";
-
+import StudentEnrollment from "./pages/StudentEnrollment";
 
 // Create Error Boundary for Global Error Handling
 const GlobalErrorFallback: React.FC<{error: Error | null}> = ({ error }) => {
@@ -68,6 +68,7 @@ function App() {
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/ParentTutoringRequestForm" element={<ParentTutoringRequestForm />} />
+                <Route path="/StudentEnrollment" element={<StudentEnrollment />} />
                 <Route path="/SchoolServiceRequestForm" element={<SchoolServiceRequestForm />} />
                 <Route path="/PurposeActionPoint" element={<PurposeActionPoint />} />
                 <Route path="/initiatives" element={<Initiatives />} />

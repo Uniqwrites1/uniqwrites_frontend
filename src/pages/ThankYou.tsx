@@ -29,6 +29,16 @@ const ThankYou: React.FC = () => {
         'Schedule a consultation at your convenience'
       ]
     },
+    student: {
+      title: 'Student Enrollment Submitted!',
+      message: 'Thank you for choosing Uniqwrites for your learning journey. We have received your enrollment request and our team will contact you within 24 hours to discuss the perfect tutor match for your studies.',
+      nextSteps: [
+        'Our team will review your academic needs',
+        'We will match you with qualified tutors',
+        'You will receive a call within 24 hours',
+        'Schedule your first tutoring session'
+      ]
+    },
     school: {
       title: 'School Service Request Submitted!',
       message: 'Thank you for your interest in Uniqwrites school services. We have received your request and our education consultants will contact you within 48 hours to discuss your specific needs.',

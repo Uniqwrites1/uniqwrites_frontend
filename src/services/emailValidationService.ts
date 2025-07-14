@@ -11,7 +11,7 @@ export interface EmailValidationResult {
 
 export interface StoredEmailRecord {
   email: string;
-  formType: 'parent' | 'school' | 'teacher' | 'initiative';
+  formType: 'parent' | 'student' | 'school' | 'teacher' | 'initiative';
   submitterName: string;
   registrationDate: string;
   id: string;
@@ -82,7 +82,7 @@ class EmailValidationService {
    */
   async registerEmail(
     email: string, 
-    formType: 'parent' | 'school' | 'teacher' | 'initiative',
+    formType: 'parent' | 'student' | 'school' | 'teacher' | 'initiative',
     submitterName: string
   ): Promise<void> {
     console.log('📝 Registering new email:', email);

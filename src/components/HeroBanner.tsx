@@ -67,7 +67,16 @@ const HeroBanner = () => {
                 className="block w-full text-left font-bold px-4 py-2 hover:bg-yellow-100 focus:bg-yellow-100 focus:outline-none"
               >
                 Tutors
-              </TutorApplyButton>              <button
+              </TutorApplyButton>
+              <button
+                className="block w-full text-left font-bold px-4 py-2 hover:bg-yellow-100 focus:bg-yellow-100 focus:outline-none"
+                role="menuitem"
+                onClick={() => handleMenuItemClick('/StudentEnrollment')}
+                onKeyDown={handleKeyDown}
+              >
+                Students
+              </button>
+              <button
                 className="block w-full text-left font-bold px-4 py-2 hover:bg-yellow-100 focus:bg-yellow-100 focus:outline-none"
                 role="menuitem"
                 onClick={() => handleMenuItemClick('/ParentTutoringRequestForm')}

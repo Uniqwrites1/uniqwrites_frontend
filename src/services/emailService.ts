@@ -12,7 +12,7 @@ export interface EmailData {
 }
 
 export interface FormSubmissionEmail {
-  formType: 'parent' | 'school' | 'teacher' | 'initiative';
+  formType: 'parent' | 'student' | 'school' | 'teacher' | 'initiative';
   submitterName: string;
   submitterEmail: string;
   formData: Record<string, unknown>;
@@ -182,6 +182,7 @@ class EmailService {  // Send form submission to admin email
   private getSubjectByFormType(formType: string): string {
     const subjects = {
       parent: 'New Parent Tutoring Request',
+      student: 'New Student Enrollment Request',
       school: 'New School Service Request',
       teacher: 'New Teacher Application',
       initiative: 'New Initiative Interest'
