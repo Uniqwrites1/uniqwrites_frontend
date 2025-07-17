@@ -83,6 +83,25 @@ const ThankYou: React.FC = () => {
 
   const currentForm = queryType || state?.formType || 'parent';
   const formData = formTypeMessages[currentForm as keyof typeof formTypeMessages] || formTypeMessages.contact;
+  // Google Form links for confirmation
+  const confirmationLinks: Record<string, { url: string; label: string }> = {
+    parent: {
+      url: 'https://forms.gle/PRBgkXqPP1fL72xu7',
+      label: 'Parent/Guardian Registration Form',
+    },
+    student: {
+      url: 'https://forms.gle/LnAFNp6q4PDR48rN6',
+      label: 'Student Enrollment Form',
+    },
+    teacher: {
+      url: 'https://forms.gle/FsAN8BuL4RE66ZL88',
+      label: 'Teacher Registration Form',
+    },
+    school: {
+      url: 'https://forms.gle/stpsdf8A8SMaMLqj7',
+      label: 'School Services Request Form',
+    },
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 py-12 px-4">
@@ -157,6 +176,22 @@ const ThankYou: React.FC = () => {
                   </motion.li>
                 ))}
               </ul>
+              {/* Confirmation Link Section */}
+              {confirmationLinks[currentForm] && (
+                <div className="mt-8 text-center">
+                  <p className="text-base text-gray-800 mb-3 font-medium">
+                    To confirm the information you entered, please click the link below and review your submission:
+                  </p>
+                  <a
+                    href={confirmationLinks[currentForm].url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition-all duration-300"
+                  >
+                    {confirmationLinks[currentForm].label}
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* Contact Information */}
