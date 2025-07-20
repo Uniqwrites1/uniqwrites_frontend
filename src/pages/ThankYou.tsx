@@ -101,6 +101,14 @@ const ThankYou: React.FC = () => {
       url: 'https://forms.gle/stpsdf8A8SMaMLqj7',
       label: 'School Services Request Form',
     },
+    initiative_volunteer: {
+      url: 'https://forms.gle/imZYNuLtVtb1KUy69',
+      label: 'Initiative Volunteer Form',
+    },
+    initiative_sponsorship: {
+      url: 'https://forms.gle/uGDV3JE2dFDHqCno7',
+      label: 'Initiative Sponsorship Form',
+    },
   };
 
   return (
@@ -177,19 +185,43 @@ const ThankYou: React.FC = () => {
                 ))}
               </ul>
               {/* Confirmation Link Section */}
-              {confirmationLinks[currentForm] && (
+              {/* Initiative form type handling */}
+              {(confirmationLinks[currentForm] ||
+                (currentForm === 'initiative' && (confirmationLinks['initiative_volunteer'] || confirmationLinks['initiative_sponsorship']))) && (
                 <div className="mt-8 text-center">
                   <p className="text-base text-gray-800 mb-3 font-medium">
                     To confirm the information you entered, please click the link below and review your submission:
                   </p>
-                  <a
-                    href={confirmationLinks[currentForm].url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition-all duration-300"
-                  >
-                    {confirmationLinks[currentForm].label}
-                  </a>
+                  {/* For initiative, show both volunteer and sponsorship links */}
+                  {currentForm === 'initiative' ? (
+                    <div className="flex flex-col gap-3 items-center">
+                      <a
+                        href={confirmationLinks['initiative_volunteer'].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition-all duration-300"
+                      >
+                        {confirmationLinks['initiative_volunteer'].label}
+                      </a>
+                      <a
+                        href={confirmationLinks['initiative_sponsorship'].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block px-6 py-2 bg-blue-600 text-white font-bold rounded-lg shadow hover:bg-blue-700 transition-all duration-300"
+                      >
+                        {confirmationLinks['initiative_sponsorship'].label}
+                      </a>
+                    </div>
+                  ) : (
+                    <a
+                      href={confirmationLinks[currentForm].url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block px-6 py-2 bg-green-600 text-white font-bold rounded-lg shadow hover:bg-green-700 transition-all duration-300"
+                    >
+                      {confirmationLinks[currentForm].label}
+                    </a>
+                  )}
                 </div>
               )}
             </div>
