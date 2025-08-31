@@ -22,6 +22,7 @@ import ApplyTutor from "./pages/apply-tutor";
 import ThankYou from "./pages/ThankYou";
 import StudentEnrollment from "./pages/StudentEnrollment";
 import WhatsAppBotPolicies from "./pages/WhatsAppBotPolicies";
+import DataDeletion from "./pages/DataDeletion";
 import Test from "./pages/Test";
 import NotFound from "./pages/NotFound";
 import AppLayout from "./layouts/AppLayout";
@@ -41,6 +42,7 @@ export const router = createBrowserRouter(
       <Route path="/apply-tutor" element={<ApplyTutor />} />
       <Route path="/blog" element={<Blog />} />      <Route path="/contact" element={<Contact />} />
       <Route path="/whatsapp-bot-policies" element={<WhatsAppBotPolicies />} />
+      <Route path="/data-deletion" element={<DataDeletion />} />
       <Route path="/test" element={<Test />} />
       <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/ParentTutoringRequestForm" element={<ParentTutoringRequestForm />} />

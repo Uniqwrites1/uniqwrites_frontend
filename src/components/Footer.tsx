@@ -127,6 +127,11 @@ const Footer = () => {
                   WhatsApp Bot Terms of Service
                 </Link>
               </li>
+              <li>
+                <Link to="/data-deletion" className="hover:text-primary text-sm">
+                  User Data Deletion
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
