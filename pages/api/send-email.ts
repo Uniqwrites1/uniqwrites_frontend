@@ -65,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Email options
     const mailOptions = {
       from: `"Uniqwrites Website" <${process.env.GMAIL_USER}>`,
-      to: 'uniqwrites1@gmail.com',
+      to: 'info@uniqwrites.africa',
       replyTo: email,
       subject: `${type} - ${name}`,
       html: htmlContent,
@@ -497,7 +497,7 @@ async function sendUserAcknowledgment(
                 <span style="color: #FFC107; margin-right: 10px; font-size: 18px;">✉️</span>
                 <div>
                   <p style="margin: 0; font-weight: 600; color: #1f2937;">Email Us</p>
-                  <p style="margin: 0; color: #6b7280; font-size: 14px;">uniqwrites1@gmail.com</p>
+                  <p style="margin: 0; color: #6b7280; font-size: 14px;">info@uniqwrites.africa</p>
                 </div>
               </div>
               <div style="display: flex; align-items: center;">

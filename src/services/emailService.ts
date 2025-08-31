@@ -1,6 +1,7 @@
 // Email service for the public site
 
 import { emailValidationService } from './emailValidationService';
+import { googleSheetsService } from './googleSheetsService';
 
 const formspreeEndpoint = import.meta.env.VITE_FORMSPREE_ENDPOINT;
 
@@ -23,7 +24,23 @@ class EmailService {  // Send form submission to admin email
     console.log('📧 Email Service - Starting form submission:', submission.formType);
     
     try {
-      console.log('📧 Step 1: Attempting Vercel serverless function...');
+      // First, try to save to Google Sheets
+      console.log('� Step 1: Attempting to save to Google Sheets...');
+      const sheetsSuccess = await googleSheetsService.submitToGoogleSheets({
+        formType: submission.formType,
+        submitterName: submission.submitterName,
+        submitterEmail: submission.submitterEmail,
+        formData: submission.formData
+      });
+      
+      if (sheetsSuccess) {
+        console.log('✅ Data saved to Google Sheets successfully');
+      } else {
+        console.log('⚠️ Failed to save to Google Sheets - likely due to authentication issue');
+        console.log('💡 Google Apps Script web apps need to be set to "Anyone" access - see docs/google-sheets-deployment-fix.md');
+      }
+
+      console.log('�📧 Step 2: Attempting Vercel serverless function...');
       const success = await this.sendViaVercelFunction(submission);
       if (success) {
         console.log('✅ Email sent successfully via Vercel function');
@@ -44,7 +61,7 @@ class EmailService {  // Send form submission to admin email
         return true;
       }
 
-      console.log('📧 Step 2: Vercel function failed, trying Formspree fallback...');
+      console.log('📧 Step 3: Vercel function failed, trying Formspree fallback...');
       const fallbackSuccess = await this.sendViaFormspree(submission);
       if (fallbackSuccess) {
         console.log('✅ Email sent successfully via Formspree fallback');
@@ -65,8 +82,9 @@ class EmailService {  // Send form submission to admin email
         return true;
       }
 
-      console.log('❌ Both email methods failed');
-      return false;
+      console.log('❌ Email methods failed, but data may have been saved to Google Sheets');
+      // If Google Sheets succeeded but email failed, still consider it a partial success
+      return sheetsSuccess;
     } catch (error) {
       console.error('❌ Failed to send form submission email:', error);
       return false;

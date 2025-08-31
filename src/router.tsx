@@ -20,6 +20,10 @@ import SchoolServiceRequestForm from "./pages/SchoolServiceRequest";
 import PurposeActionPoint from "./pages/PurposeActionPoint";
 import ApplyTutor from "./pages/apply-tutor";
 import ThankYou from "./pages/ThankYou";
+import StudentEnrollment from "./pages/StudentEnrollment";
+import WhatsAppBotPolicies from "./pages/WhatsAppBotPolicies";
+import Test from "./pages/Test";
+import NotFound from "./pages/NotFound";
 import AppLayout from "./layouts/AppLayout";
 
 /**
@@ -36,8 +40,11 @@ export const router = createBrowserRouter(
       <Route path="/services" element={<Services />} />
       <Route path="/apply-tutor" element={<ApplyTutor />} />
       <Route path="/blog" element={<Blog />} />      <Route path="/contact" element={<Contact />} />
+      <Route path="/whatsapp-bot-policies" element={<WhatsAppBotPolicies />} />
+      <Route path="/test" element={<Test />} />
       <Route path="/thank-you" element={<ThankYou />} />
       <Route path="/ParentTutoringRequestForm" element={<ParentTutoringRequestForm />} />
+      <Route path="/StudentEnrollment" element={<StudentEnrollment />} />
       <Route path="/SchoolServiceRequestForm" element={<SchoolServiceRequestForm />} />
       <Route path="/PurposeActionPoint" element={<PurposeActionPoint />} />
       <Route path="/initiatives" element={<Initiatives />} />
@@ -46,5 +53,8 @@ export const router = createBrowserRouter(
       <Route path="/initiatives/literacy/volunteer" element={<LiteracyVolunteer />} />
       <Route path="/initiatives/backtoschool/sponsor" element={<BackToSchoolSponsor />} />
       <Route path="/initiatives/backtoschool/volunteer" element={<BackToSchoolVolunteer />} />
-    </Route>  )
+      {/* Catch-all route for 404 pages */}
+      <Route path="*" element={<NotFound />} />
+    </Route>
+  )
 );

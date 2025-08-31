@@ -7,7 +7,7 @@ const Footer = () => {
   return (
     <footer className="bg-secondary text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
           <div>
             <div className="flex items-center mb-4">
               <img
@@ -94,7 +94,7 @@ const Footer = () => {
                 <Instagram />
               </a>
               <a 
-                href="mailto:uniqwrites1@gmail.com" 
+                href="mailto:info@uniqwrites.africa" 
                 className="hover:text-primary"
                 aria-label="Send us an email"
               >
@@ -113,6 +113,21 @@ const Footer = () => {
             <p className="text-sm">
               Subscribe to our newsletter for updates and educational resources.
             </p>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link to="/whatsapp-bot-policies#privacy" className="hover:text-primary text-sm">
+                  WhatsApp Bot Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link to="/whatsapp-bot-policies#terms" className="hover:text-primary text-sm">
+                  WhatsApp Bot Terms of Service
+                </Link>
+              </li>
+            </ul>
           </div>
         </div>
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
