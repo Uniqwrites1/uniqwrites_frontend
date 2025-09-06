@@ -19,29 +19,34 @@ function doPost(e) {
     // Log the incoming data for debugging
     console.log('Received data:', data);
     
-    // Create a row with the data
+    // Create a row with the data formatted specifically for each form type
     const timestamp = data.timestamp || new Date().toISOString();
+    let rowData = [];
     
-    // Create a comprehensive row that works for all form types
-    const rowData = [
-      timestamp,
-      data.formType || 'unknown',
-      data.name || data.parentName || data.studentName || data.teacherName || data.contactPersonName || data.participantName || '',
-      data.email || data.parentEmail || data.studentEmail || data.teacherEmail || data.contactPersonEmail || data.participantEmail || '',
-      data.phoneNumber || '',
-      data.childName || data.school || data.schoolName || data.qualifications || data.organization || '',
-      data.childAge || data.age || data.grade || data.experience || data.interest || '',
-      data.childGrade || data.gradeLevel || data.gradePreference || data.participationType || '',
-      data.subjectsRequested || data.subjectsNeeded || data.subjectsOfExpertise || data.serviceType || data.skills || '',
-      data.preferredSchedule || data.currentChallenges || data.availability || data.numberOfStudents || data.availableTime || '',
-      data.learningGoals || data.teachingApproach || data.projectDuration || data.sponsorshipAmount || '',
-      data.specialRequirements || data.specificRequirements || data.references || data.sponsorshipType || '',
-      data.preferredLocation || data.location || data.preferredStartDate || data.previousExperience || '',
-      data.budget || data.additionalInformation || data.motivation || '',
-      data.additionalComments || data.resume || JSON.stringify(data)
-    ];
+    // Format data based on form type to match specific sheet columns
+    switch(data.formType) {
+      case 'parent':
+        rowData = formatParentData(data, timestamp);
+        break;
+      case 'student':
+        rowData = formatStudentData(data, timestamp);
+        break;
+      case 'school':
+        rowData = formatSchoolData(data, timestamp);
+        break;
+      case 'teacher':
+        rowData = formatTeacherData(data, timestamp);
+        break;
+      case 'initiative':
+        rowData = formatInitiativeData(data, timestamp);
+        break;
+      default:
+        // Fallback to generic format for unknown types
+        rowData = formatGenericData(data, timestamp);
+    }
     
     // Add the data to the sheet
+    sheet.appendRow(rowData);
     sheet.appendRow(rowData);
     
     // Send automated welcome email to user
@@ -394,4 +399,219 @@ function testWelcomeEmail() {
   } catch (error) {
     console.error('Test email failed:', error);
   }
+}
+
+/**
+ * Format Parent Form Data to match specific sheet columns
+ * Columns: Timestamp, Full name, Phone Number, Email address, Residential Address, State of Residence, 
+ *          Relationship to Student, Student(s) Name, Age, Current Class, Column 10, Subjects Requested, 
+ *          preferred mode, Duration per Lesson, Preferred Lesson Time, Start Date, preferred Tutor Gender, 
+ *          Language Preference, Qualification Priority, Tell us more about you ward(s) peculiarity, 
+ *          Preferred Lesson Days, Lead Status, Column 1
+ */
+function formatParentData(data, timestamp) {
+  const formData = data.formData || {};
+  const parentInfo = formData.parentInfo || {};
+  const students = formData.students || [{}];
+  const tutoringRequirements = formData.tutoringRequirements || {};
+  const tutorPreferences = formData.tutorPreferences || {};
+  
+  // Get primary student info (first student)
+  const primaryStudent = students[0] || {};
+  
+  // Format preferred days
+  const preferredDays = tutoringRequirements.preferredDays || {};
+  const daysArray = [];
+  Object.keys(preferredDays).forEach(day => {
+    if (preferredDays[day]) {
+      daysArray.push(day.charAt(0).toUpperCase() + day.slice(1));
+    }
+  });
+  const preferredDaysStr = daysArray.join(', ');
+  
+  // Format services type
+  const servicesType = tutoringRequirements.servicesType || {};
+  const servicesArray = [];
+  Object.keys(servicesType).forEach(service => {
+    if (servicesType[service]) {
+      servicesArray.push(service);
+    }
+  });
+  const servicesTypeStr = servicesArray.join(', ');
+  
+  return [
+    timestamp, // Timestamp
+    parentInfo.fullName || '', // Full name
+    parentInfo.phoneNumber || '', // Phone Number
+    parentInfo.emailAddress || '', // Email address
+    parentInfo.residentialAddress || '', // Residential Address
+    parentInfo.stateOfResidence || '', // State of Residence
+    parentInfo.relationshipToStudent || '', // Relationship to Student
+    primaryStudent.name || '', // Student(s) Name
+    primaryStudent.age || '', // Age
+    primaryStudent.currentClass || '', // Current Class
+    '', // Column 10 (empty)
+    tutoringRequirements.subjectsRequested || '', // Subjects Requested
+    tutoringRequirements.preferredMode || '', // preferred mode
+    tutoringRequirements.durationPerLesson || '', // Duration per Lesson
+    tutoringRequirements.preferredLessonTime || '', // Preferred Lesson Time
+    tutoringRequirements.startDate || '', // Start Date
+    tutorPreferences.preferredGender || '', // preferred Tutor Gender
+    tutorPreferences.languagePreference || '', // Language Preference
+    tutorPreferences.qualificationsPriority || '', // Qualification Priority
+    primaryStudent.peculiarity || '', // Tell us more about you ward(s) peculiarity
+    preferredDaysStr, // Preferred Lesson Days
+    'New', // Lead Status
+    '' // Column 1 (empty)
+  ];
+}
+
+/**
+ * Format Student Form Data
+ */
+function formatStudentData(data, timestamp) {
+  const formData = data.formData || {};
+  
+  return [
+    timestamp, // Timestamp
+    formData.fullName || '', // Full Name
+    formData.age || '', // Age
+    formData.phoneNumber || '', // Phone Number
+    formData.emailAddress || '', // Email Address
+    formData.residentialAddress || '', // Residential Address
+    formData.stateOfResidence || '', // State of Residence
+    formData.emergencyContact || '', // Emergency Contact
+    formData.emergencyContactPhone || '', // Emergency Contact Phone
+    formData.currentClass || '', // Current Class
+    formData.currentSchool || '', // Current School
+    formData.previousGrades || '', // Previous Grades
+    formData.academicChallenges || '', // Academic Challenges
+    formData.learningGoals || '', // Learning Goals
+    formData.subjectsRequested || '', // Subjects Requested
+    formData.preferredMode || '', // Preferred Mode
+    formatPreferredDays(formData.preferredDays), // Preferred Days
+    formData.durationPerLesson || '', // Duration per Lesson
+    formData.preferredLessonTime || '', // Preferred Lesson Time
+    formData.startDate || '', // Start Date
+    formData.preferredGender || '', // Preferred Gender
+    formData.languagePreference || '', // Language Preference
+    formData.qualificationsPriority || '', // Qualifications Priority
+    formData.specialNeeds || '', // Special Needs
+    'New' // Lead Status
+  ];
+}
+
+/**
+ * Format School Form Data
+ */
+function formatSchoolData(data, timestamp) {
+  const formData = data.formData || {};
+  const schoolInfo = formData.schoolInfo || {};
+  const contactInfo = formData.contactInfo || {};
+  const serviceDetails = formData.serviceDetails || {};
+  
+  return [
+    timestamp, // Timestamp
+    schoolInfo.schoolName || '', // School Name
+    Array.isArray(schoolInfo.schoolType) ? schoolInfo.schoolType.join(', ') : schoolInfo.schoolType || '', // School Type
+    schoolInfo.schoolAddress || '', // School Address
+    schoolInfo.state || '', // State
+    schoolInfo.lga || '', // LGA
+    schoolInfo.schoolEmail || '', // School Email
+    contactInfo.contactPersonName || '', // Contact Person Name
+    contactInfo.contactPhoneNumber || '', // Contact Phone Number
+    Array.isArray(serviceDetails.serviceType) ? serviceDetails.serviceType.join(', ') : serviceDetails.serviceType || '', // Service Type
+    serviceDetails.teacherRequestDetails ? JSON.stringify(serviceDetails.teacherRequestDetails) : '', // Teacher Request Details
+    serviceDetails.edTechServiceDetails ? JSON.stringify(serviceDetails.edTechServiceDetails) : '', // EdTech Service Details
+    serviceDetails.additionalNotes || '', // Additional Notes
+    serviceDetails.agreementConfirmed ? 'Yes' : 'No', // Agreement Confirmed
+    'New' // Lead Status
+  ];
+}
+
+/**
+ * Format Teacher Form Data
+ */
+function formatTeacherData(data, timestamp) {
+  const formData = data.formData || {};
+  
+  return [
+    timestamp, // Timestamp
+    formData.fullName || '', // Full Name
+    formData.gender || '', // Gender
+    formData.dateOfBirth || '', // Date of Birth
+    formData.phoneNumber || '', // Phone Number
+    formData.email || '', // Email
+    formData.address || '', // Address
+    formData.state || '', // State
+    formData.highestQualification || '', // Highest Qualification
+    Array.isArray(formData.teachingCertifications) ? formData.teachingCertifications.join(', ') : formData.teachingCertifications || '', // Teaching Certifications
+    Array.isArray(formData.subjectsOfExpertise) ? formData.subjectsOfExpertise.join(', ') : formData.subjectsOfExpertise || '', // Subjects of Expertise
+    formData.yearsOfExperience || '', // Years of Experience
+    Array.isArray(formData.preferredStudentLevels) ? formData.preferredStudentLevels.join(', ') : formData.preferredStudentLevels || '', // Preferred Student Levels
+    Array.isArray(formData.availableMode) ? formData.availableMode.join(', ') : formData.availableMode || '', // Available Mode
+    Array.isArray(formData.preferredOpportunities) ? formData.preferredOpportunities.join(', ') : formData.preferredOpportunities || '', // Preferred Opportunities
+    'CV Uploaded', // CV Status (files can't be processed directly)
+    'Photo Uploaded', // Photo Status
+    'Certificates Uploaded', // Certificates Status
+    'New' // Application Status
+  ];
+}
+
+/**
+ * Format Initiative Form Data
+ */
+function formatInitiativeData(data, timestamp) {
+  const formData = data.formData || {};
+  
+  return [
+    timestamp, // Timestamp
+    formData.fullName || '', // Full Name
+    formData.email || '', // Email
+    formData.phoneNumber || '', // Phone Number
+    formData.address || '', // Address
+    formData.occupation || '', // Occupation
+    formData.initiativeType || '', // Initiative Type (literacy, back-to-school)
+    formData.participationType || '', // Participation Type (sponsor, volunteer)
+    formData.contributionType || '', // Contribution Type
+    formData.amount || '', // Amount (for sponsors)
+    formData.availability || '', // Availability (for volunteers)
+    formData.skills || '', // Skills
+    formData.motivation || '', // Motivation
+    formData.additionalComments || '', // Additional Comments
+    'New' // Status
+  ];
+}
+
+/**
+ * Format Generic Data (fallback)
+ */
+function formatGenericData(data, timestamp) {
+  return [
+    timestamp,
+    data.name || data.fullName || '',
+    data.email || '',
+    data.phoneNumber || data.phone || '',
+    data.formType || '',
+    JSON.stringify(data.formData || data),
+    'New'
+  ];
+}
+
+/**
+ * Helper function to format preferred days
+ */
+function formatPreferredDays(preferredDays) {
+  if (!preferredDays || typeof preferredDays !== 'object') {
+    return '';
+  }
+  
+  const daysArray = [];
+  Object.keys(preferredDays).forEach(day => {
+    if (preferredDays[day]) {
+      daysArray.push(day.charAt(0).toUpperCase() + day.slice(1));
+    }
+  });
+  
+  return daysArray.join(', ');
 }
