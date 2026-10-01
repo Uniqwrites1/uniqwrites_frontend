@@ -234,7 +234,7 @@ const ThankYou: React.FC = () => {
                   <Mail className="w-5 h-5 text-yellow-600 mr-3" />
                   <div>
                     <p className="font-medium text-gray-900">Email Us</p>
-                    <p className="text-gray-600 text-sm">info@uniqwrites.africa</p>
+                    <p className="text-gray-600 text-sm">info@uniqwritesafrica.com.ng</p>
                   </div>
                 </div>
                 <div className="flex items-center">

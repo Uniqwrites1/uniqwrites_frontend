@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import { 
   BrowserRouter as Router, 
   Routes, 
+  Navigate,
   Route
 } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
@@ -18,7 +19,7 @@ import LiteracySponsor from "./pages/initiatives/literacy/LiteracySponsor";
 import LiteracyVolunteer from "./pages/initiatives/literacy/LiteracyVolunteer";
 import BackToSchoolSponsor from "./pages/initiatives/backtoschool/BackToSchoolSponsor";
 import BackToSchoolVolunteer from "./pages/initiatives/backtoschool/BackToSchoolVolunteer";
-import Blog from "./pages/Blog";
+import Resources from "./pages/Resources";
 import ParentTutoringRequestForm from "./pages/ParentTutoringRequest";
 import SchoolServiceRequestForm from "./pages/SchoolServiceRequest";
 import PurposeActionPoint from "./pages/PurposeActionPoint";
@@ -65,7 +66,8 @@ function App() {
                 <Route path="/about" element={<About />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/apply-tutor" element={<ApplyTutor />} />
-                <Route path="/blog" element={<Blog />} />
+                <Route path="/resources" element={<Resources />} />
+                <Route path="/blog" element={<Navigate to="/resources" replace />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/ParentTutoringRequestForm" element={<ParentTutoringRequestForm />} />
                 <Route path="/StudentEnrollment" element={<StudentEnrollment />} />

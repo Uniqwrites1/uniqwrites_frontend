@@ -1,10 +1,11 @@
-import React, { Suspense } from "react";
-import { Outlet } from "react-router-dom";
+import React, { Suspense, useLayoutEffect } from "react";
+import { Outlet, useLocation } from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ErrorHandler } from "../utils/errorHandler";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { updateSeoMetadata } from "../utils/seo";
 
 // Create Error Boundary for Global Error Handling
 const GlobalErrorFallback: React.FC<{error: Error | null}> = ({ error }) => {
@@ -36,6 +37,21 @@ const GlobalErrorBoundary = ErrorHandler.createErrorBoundary(GlobalErrorFallback
  * - Error boundary
  */
 const AppLayout: React.FC = () => {
+  const location = useLocation();
+
+  useLayoutEffect(() => {
+    updateSeoMetadata(location.pathname);
+
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    window.history.scrollRestoration = 'manual';
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.pathname]);
+
   return (
     <GlobalErrorBoundary>
       <div className="min-h-screen bg-white flex flex-col">

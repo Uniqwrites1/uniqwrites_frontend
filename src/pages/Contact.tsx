@@ -70,7 +70,7 @@ const Contact = () => {
                   <Phone className="w-6 h-6 text-primary mr-4" />
                   <div>
                     <h3 className="font-semibold">Phone</h3>
-                    <p className="text-gray-600">+234 706 663 3734</p>
+                    <p className="text-gray-600">+234 916 492 3056</p>
                   </div>
                 </div>
 
@@ -78,7 +78,7 @@ const Contact = () => {
                   <Mail className="w-6 h-6 text-primary mr-4" />
                   <div>
                     <h3 className="font-semibold">Email</h3>
-                    <p className="text-gray-600">info@uniqwrites.africa</p>
+                    <p className="text-gray-600">info@uniqwritesafrica.com.ng</p>
                   </div>
                 </div>
 
@@ -96,7 +96,7 @@ const Contact = () => {
                   <MessageSquare className="w-6 h-6 text-primary mr-4" />
                   <div>
                     <h3 className="font-semibold">WhatsApp</h3>
-                    <p className="text-gray-600">+234 916 492 3056</p>
+                    <p className="text-gray-600">09164923056</p>
                   </div>
                 </div>
               </div>

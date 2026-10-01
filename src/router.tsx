@@ -1,31 +1,32 @@
+import { lazy } from "react";
 import { 
   createBrowserRouter, 
   createRoutesFromElements, 
+  Navigate,
   Route 
 } from "react-router-dom";
-
-// Import pages
-import Home from "./pages/Home";
-import About from "./pages/About";
-import Services from "./pages/Services";
-import Contact from "./pages/Contact";
-import Initiatives from "./pages/initiatives/Initiatives";
-import LiteracySponsor from "./pages/initiatives/literacy/LiteracySponsor";
-import LiteracyVolunteer from "./pages/initiatives/literacy/LiteracyVolunteer";
-import BackToSchoolSponsor from "./pages/initiatives/backtoschool/BackToSchoolSponsor";
-import BackToSchoolVolunteer from "./pages/initiatives/backtoschool/BackToSchoolVolunteer";
-import Blog from "./pages/Blog";
-import ParentTutoringRequestForm from "./pages/ParentTutoringRequest";
-import SchoolServiceRequestForm from "./pages/SchoolServiceRequest";
-import PurposeActionPoint from "./pages/PurposeActionPoint";
-import ApplyTutor from "./pages/apply-tutor";
-import ThankYou from "./pages/ThankYou";
-import StudentEnrollment from "./pages/StudentEnrollment";
-import WhatsAppBotPolicies from "./pages/WhatsAppBotPolicies";
-import DataDeletion from "./pages/DataDeletion";
-import Test from "./pages/Test";
-import NotFound from "./pages/NotFound";
 import AppLayout from "./layouts/AppLayout";
+
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Services = lazy(() => import("./pages/Services"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Initiatives = lazy(() => import("./pages/initiatives/Initiatives"));
+const LiteracySponsor = lazy(() => import("./pages/initiatives/literacy/LiteracySponsor"));
+const LiteracyVolunteer = lazy(() => import("./pages/initiatives/literacy/LiteracyVolunteer"));
+const BackToSchoolSponsor = lazy(() => import("./pages/initiatives/backtoschool/BackToSchoolSponsor"));
+const BackToSchoolVolunteer = lazy(() => import("./pages/initiatives/backtoschool/BackToSchoolVolunteer"));
+const Resources = lazy(() => import("./pages/Resources"));
+const ParentTutoringRequestForm = lazy(() => import("./pages/ParentTutoringRequest"));
+const SchoolServiceRequestForm = lazy(() => import("./pages/SchoolServiceRequest"));
+const PurposeActionPoint = lazy(() => import("./pages/PurposeActionPoint"));
+const ApplyTutor = lazy(() => import("./pages/apply-tutor"));
+const ThankYou = lazy(() => import("./pages/ThankYou"));
+const StudentEnrollment = lazy(() => import("./pages/StudentEnrollment"));
+const WhatsAppBotPolicies = lazy(() => import("./pages/WhatsAppBotPolicies"));
+const DataDeletion = lazy(() => import("./pages/DataDeletion"));
+const Test = lazy(() => import("./pages/Test"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 /**
  * Create router with future flags enabled to prevent deprecation warnings
@@ -40,7 +41,9 @@ export const router = createBrowserRouter(
       <Route path="/about" element={<About />} />
       <Route path="/services" element={<Services />} />
       <Route path="/apply-tutor" element={<ApplyTutor />} />
-      <Route path="/blog" element={<Blog />} />      <Route path="/contact" element={<Contact />} />
+      <Route path="/resources" element={<Resources />} />
+      <Route path="/blog" element={<Navigate to="/resources" replace />} />
+      <Route path="/contact" element={<Contact />} />
       <Route path="/whatsapp-bot-policies" element={<WhatsAppBotPolicies />} />
       <Route path="/data-deletion" element={<DataDeletion />} />
       <Route path="/test" element={<Test />} />

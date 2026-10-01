@@ -134,8 +134,8 @@ const WhatsAppBotPolicies: React.FC = () => {
                   <p className="text-gray-700 mb-3">If you have questions about this Privacy Policy, please contact us at:</p>
                   <div className="flex items-center text-yellow-600">
                     <Mail className="w-5 h-5 mr-2" />
-                    <a href="mailto:info@uniqwrites.africa" className="hover:underline">
-                      info@uniqwrites.africa
+                    <a href="mailto:info@uniqwritesafrica.com.ng" className="hover:underline">
+                      info@uniqwritesafrica.com.ng
                     </a>
                   </div>
                 </section>
@@ -223,8 +223,8 @@ const WhatsAppBotPolicies: React.FC = () => {
                   <p className="text-gray-700 mb-3">For questions about these Terms, please contact:</p>
                   <div className="flex items-center text-yellow-600">
                     <Mail className="w-5 h-5 mr-2" />
-                    <a href="mailto:info@uniqwrites.africa" className="hover:underline">
-                      info@uniqwrites.africa
+                    <a href="mailto:info@uniqwritesafrica.com.ng" className="hover:underline">
+                      info@uniqwritesafrica.com.ng
                     </a>
                   </div>
                 </section>

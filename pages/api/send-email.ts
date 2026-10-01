@@ -65,7 +65,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Email options
     const mailOptions = {
       from: `"Uniqwrites Website" <${process.env.GMAIL_USER}>`,
-      to: 'info@uniqwrites.africa',
+      to: 'info@uniqwritesafrica.com.ng',
       replyTo: email,
       subject: `${type} - ${name}`,
       html: htmlContent,

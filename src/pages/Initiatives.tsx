@@ -10,6 +10,7 @@ const Initiatives = () => {
   return (
     <div className="min-h-screen bg-white py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="mb-8 text-4xl font-bold text-center text-black">Our Education Initiatives</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 align-start">
           {/* Literacy Immersion Outreach Section */}
           <div className="bg-white shadow-md rounded-lg p-6 flex flex-col relative">
@@ -19,7 +20,7 @@ const Initiatives = () => {
               className="mb-4 rounded-lg animate-fade-in"
               style={{ width: "100%", height: "200px", objectFit: "cover" }}
             />
-            <h1 className="text-3xl font-bold text-black mb-2">Literacy Immersion Outreach</h1>
+            <h2 className="text-3xl font-bold text-black mb-2">Literacy Immersion Outreach</h2>
             
             <div style={{ marginBottom: "60px" }}>
               <p className="text-lg text-gray-600 mb-4">
@@ -80,7 +81,7 @@ const Initiatives = () => {
               className="mb-4 rounded-lg animate-fade-in"
               style={{ width: "100%", height: "200px", objectFit: "cover" }}
             />
-            <h1 className="text-3xl font-bold text-black mb-2">Back-to-School Initiative</h1>
+            <h2 className="text-3xl font-bold text-black mb-2">Back-to-School Initiative</h2>
             
             <div style={{ marginBottom: "60px" }}>
               <p className="text-lg text-gray-600 mb-4">

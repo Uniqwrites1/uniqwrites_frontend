@@ -130,7 +130,7 @@ function sendWelcomeEmail(data, timestamp) {
       to: email,
       subject: emailContent.subject,
       body: emailContent.message,
-      replyTo: 'info@uniqwrites.africa',
+      replyTo: 'info@uniqwritesafrica.com.ng',
       name: 'Uniqwrites Educational Concepts'
     });
     
@@ -150,7 +150,7 @@ function getEmailContentByType(formType, fullName, formattedTimestamp, data) {
 🧠 *Empowering learners. Uplifting educators.*`;
 
   const baseContact = `📎 **Need Assistance?**  
-Reach us directly at: **info@uniqwrites.africa** or reply to this email.
+Reach us directly at: **info@uniqwritesafrica.com.ng** or reply to this email.
 
 💬 While you wait, please feel free to explore our platform:  
 🌐 Website: www.uniqwrites.africa`;
