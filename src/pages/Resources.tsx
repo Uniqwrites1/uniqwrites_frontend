@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowUpRight, BookOpen, GraduationCap, Search, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, BookOpen, Play, Search, Sparkles } from "lucide-react";
 
 const categories = ["All", "For learners", "For teachers", "Literacy", "Maths", "Science", "Textbooks"] as const;
 type Category = Exclude<(typeof categories)[number], "All">;
@@ -141,6 +141,9 @@ const resources: {
 const simulationUrl =
   "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/" +
   "forces-and-motion-basics_all.html";
+const simulationPreviewUrl =
+  "https://phet.colorado.edu/sims/html/forces-and-motion-basics/latest/" +
+  "forces-and-motion-basics-900.png";
 
 const Resources = () => {
   const [activeCategory, setActiveCategory] = useState<(typeof categories)[number]>("All");
@@ -156,16 +159,35 @@ const Resources = () => {
   return (
     <main className="min-h-screen bg-white text-[#1F1F1F]">
       <section className="border-b border-black/10 bg-[#F7F7F5]">
-        <div className="mx-auto max-w-[1200px] px-4 py-14 sm:px-6 sm:py-20 lg:px-6">
-          <p className="mb-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#9A7200]">Learn and explore</p>
-          <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-[#111111] sm:text-5xl">Free learning resources</h1>
-          <p className="mt-5 max-w-2xl text-base leading-7 text-[#5F5F5F] sm:text-lg">
-            A curated collection of stories, textbooks, practice, and interactive lessons from trusted education providers.
-          </p>
+        <div className="mx-auto grid max-w-[1200px] items-center gap-8 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.9fr_1.1fr] lg:px-6 lg:py-16">
+          <div>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#9A7200]">Learn and explore</p>
+            <h1 className="max-w-xl text-4xl font-semibold leading-tight text-[#111111] sm:text-5xl">Free learning resources</h1>
+            <p className="mt-5 max-w-lg text-base leading-7 text-[#5F5F5F] sm:text-lg">
+              Stories, textbooks, practice, and interactive lessons for curious learners and educators.
+            </p>
+            <a href="#interactive-lesson" className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-[#F5B800] px-5 py-3 text-sm font-semibold text-[#111111] transition-colors hover:bg-[#F7C82E]">
+              Try an interactive lesson <ArrowRight size={17} />
+            </a>
+          </div>
+          <a href="#interactive-lesson" className="group relative block aspect-video overflow-hidden rounded-lg border border-black/10 bg-[#222222] shadow-[0_18px_40px_rgba(17,17,17,0.14)]">
+            <img
+              src={simulationPreviewUrl}
+              alt="PhET Forces and Motion simulation preview showing interactive objects and force controls"
+              width={900}
+              height={506}
+              loading="eager"
+              decoding="async"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            />
+            <span className="absolute bottom-0 left-0 right-0 bg-[#111111]/85 px-4 py-3 text-sm font-semibold text-white sm:px-5">
+              Featured interactive lesson <span className="font-normal text-white/75">· Forces and Motion</span>
+            </span>
+          </a>
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-[1200px] gap-8 px-4 py-12 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-6 lg:py-16">
+      <section id="interactive-lesson" className="mx-auto grid max-w-[1200px] gap-8 px-4 py-10 sm:px-6 lg:grid-cols-[0.8fr_1.2fr] lg:px-6 lg:py-14">
         <div className="flex flex-col justify-center">
           <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.16em] text-[#9A7200]">
             <Sparkles size={16} /> Interactive lesson
@@ -190,7 +212,7 @@ const Resources = () => {
           <p className="mt-3 text-xs leading-5 text-[#666666]">The simulation loads from PhET only when you choose to open it.</p>
         </div>
 
-        <div className="min-h-[260px] overflow-hidden rounded-lg border border-black/10 bg-[#F7F7F5] sm:min-h-[360px]">
+        <div className="aspect-video overflow-hidden rounded-lg border border-black/10 bg-[#222222] shadow-[0_16px_40px_rgba(17,17,17,0.10)]">
           {showSimulation ? (
             <iframe
               title="PhET Forces and Motion: Basics interactive simulation"
@@ -201,13 +223,28 @@ const Resources = () => {
               className="aspect-video w-full"
             />
           ) : (
-            <div className="flex h-full min-h-[260px] flex-col items-center justify-center px-6 py-10 text-center sm:min-h-[360px]">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#F5B800]/20 text-[#8A6500]">
-                <GraduationCap size={32} />
-              </div>
-              <p className="mt-4 text-lg font-semibold text-[#111111]">A hands-on science activity</p>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-[#5F5F5F]">Choose “Load interactive simulation” to start exploring four motion experiments.</p>
-            </div>
+            <button
+              type="button"
+              onClick={() => setShowSimulation(true)}
+              aria-label="Start the PhET Forces and Motion: Basics simulation"
+              className="group relative block h-full w-full overflow-hidden text-left"
+            >
+              <img
+                src={simulationPreviewUrl}
+                alt="Preview of the Forces and Motion: Basics simulation"
+                width={900}
+                height={506}
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+              />
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/15 text-white transition-colors group-hover:bg-black/30">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-[#F5B800] text-[#111111] shadow-lg">
+                  <Play size={26} fill="currentColor" />
+                </span>
+                <span className="rounded-full bg-black/75 px-4 py-2 text-sm font-semibold">Start interactive simulation</span>
+              </span>
+            </button>
           )}
         </div>
       </section>
@@ -245,7 +282,7 @@ const Resources = () => {
         </div>
       </section>
 
-      <section className="border-y border-black/10 bg-[#F7F7F5]">
+      <section id="resource-library" className="border-y border-black/10 bg-[#F7F7F5]">
         <div className="mx-auto max-w-[1200px] px-4 py-12 sm:px-6 lg:px-6 lg:py-16">
           <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
             <div>
